@@ -1,0 +1,4 @@
+conf=10000 dec=61608 clauses=18890 dl=13
+UNSAT conflicts=19236 decisions=89481 props=3572480 sec=0.74622
+Command exited with non-zero status 20
+time=0:00.75 rss=8244KB

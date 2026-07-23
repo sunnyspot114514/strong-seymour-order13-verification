@@ -1,6 +1,9 @@
 /build/
 /regenerated/
 /milp_results/
+**/build/
+**/regenerated/
+**/milp_results/
 /.venv/
 /venv/
 __pycache__/

@@ -1,0 +1,27 @@
+{
+  "theorem": "Every regular tournament on 13 vertices has at least 11 strong Seymour vertices.",
+  "tight": true,
+  "maximum_non_strong_vertices": 2,
+  "minimum_strong_vertices": 11,
+  "upper_bound_proof": {
+    "statement": "No 13-vertex regular tournament has at least 3 non-strong vertices.",
+    "method": "Six exhaustive normalized SAT branches indexed by the left-side size p=0,...,5 of a padded size-five vertex-cover certificate at a chosen failing root.",
+    "branches": [
+      {"p":0,"status":"UNSAT","rup_steps":1},
+      {"p":1,"status":"UNSAT","rup_steps":1},
+      {"p":2,"status":"UNSAT","rup_steps":19031},
+      {"p":3,"status":"UNSAT","rup_steps":19236},
+      {"p":4,"status":"UNSAT","rup_steps":1},
+      {"p":5,"status":"UNSAT","rup_steps":1}
+    ],
+    "checkers": ["watched-literal C++ RUP checker", "independent full-scan/occurrence C++ RUP checker"]
+  },
+  "tight_witness": {
+    "status": "SAT",
+    "normalized_branch_p": 2,
+    "non_strong_vertices": [0,5],
+    "strong_vertices": [1,2,3,4,6,7,8,9,10,11,12],
+    "matching_sizes": [5,6,6,6,6,5,6,6,6,6,6,6,6],
+    "adjacency_matrix_sha256": "8f7926e1544e8bc087fbce2595754b7a9c30719be7ced398368c053cf45c09fb"
+  }
+}

@@ -68,6 +68,12 @@ The resulting unlabelled distribution is:
 See [`enumeration/`](enumeration/) for source, pinned dataset provenance,
 complete results, logs, and one-command reproduction.
 
+All 61 classes with fewer than thirteen strong vertices are published with
+Hall-defect and perfect-matching certificates. In addition, nauty 2.9.3
+`gentourng` was built from authenticated source and independently regenerated
+all 1,495,297 classes. It reproduced the distribution above, and canonical
+`labelg` comparison found the same 61 exceptional isomorphism classes.
+
 ## Reproduce the exact extremal verification
 
 Requirements are Python 3, Bash, and a C++17 compiler exposed as `g++`.

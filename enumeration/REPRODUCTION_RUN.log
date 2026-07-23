@@ -1,33 +1,33 @@
-processed=100000 elapsed_seconds=0.684926 current_minimum=13
-processed=200000 elapsed_seconds=1.37494 current_minimum=13
-processed=300000 elapsed_seconds=2.09478 current_minimum=13
-processed=400000 elapsed_seconds=2.78477 current_minimum=13
-processed=500000 elapsed_seconds=3.50181 current_minimum=12
-processed=600000 elapsed_seconds=4.17657 current_minimum=12
-processed=700000 elapsed_seconds=4.86749 current_minimum=12
-processed=800000 elapsed_seconds=5.55703 current_minimum=11
-processed=900000 elapsed_seconds=6.27653 current_minimum=11
-processed=1000000 elapsed_seconds=6.95098 current_minimum=11
-processed=1100000 elapsed_seconds=7.6402 current_minimum=11
-processed=1200000 elapsed_seconds=8.3412 current_minimum=11
-processed=1300000 elapsed_seconds=9.02803 current_minimum=11
-processed=1400000 elapsed_seconds=9.72385 current_minimum=11
-complete records=1495297 elapsed_seconds=10.3886 minimum_strong=11 minimum_count=13
-	Command being timed: "./verify_rt13_catalog"
-	User time (seconds): 10.40
-	System time (seconds): 0.09
-	Percent of CPU this job got: 101%
-	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:10.39
+processed=100000 elapsed_seconds=0.695004 current_minimum=13
+processed=200000 elapsed_seconds=1.39842 current_minimum=13
+processed=300000 elapsed_seconds=2.10545 current_minimum=13
+processed=400000 elapsed_seconds=2.80084 current_minimum=13
+processed=500000 elapsed_seconds=3.49862 current_minimum=12
+processed=600000 elapsed_seconds=4.19868 current_minimum=12
+processed=700000 elapsed_seconds=4.90325 current_minimum=12
+processed=800000 elapsed_seconds=5.60736 current_minimum=11
+processed=900000 elapsed_seconds=6.30975 current_minimum=11
+processed=1000000 elapsed_seconds=6.99553 current_minimum=11
+processed=1100000 elapsed_seconds=7.71042 current_minimum=11
+processed=1200000 elapsed_seconds=8.44491 current_minimum=11
+processed=1300000 elapsed_seconds=9.17318 current_minimum=11
+processed=1400000 elapsed_seconds=9.90273 current_minimum=11
+complete records=1495297 elapsed_seconds=10.5645 minimum_strong=11 minimum_count=13
+	Command being timed: "./verify_rt13_catalog --exceptions-file EXCEPTIONAL_CLASSES.generated.jsonl"
+	User time (seconds): 10.49
+	System time (seconds): 0.14
+	Percent of CPU this job got: 100%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:10.57
 	Average shared text size (kbytes): 0
 	Average unshared data size (kbytes): 0
 	Average stack size (kbytes): 0
 	Average total size (kbytes): 0
-	Maximum resident set size (kbytes): 3708
+	Maximum resident set size (kbytes): 3716
 	Average resident set size (kbytes): 0
-	Major (requiring I/O) page faults: 1
-	Minor (reclaiming a frame) page faults: 149
-	Voluntary context switches: 229
-	Involuntary context switches: 50
+	Major (requiring I/O) page faults: 2
+	Minor (reclaiming a frame) page faults: 150
+	Voluntary context switches: 254
+	Involuntary context switches: 46
 	Swaps: 0
 	File system inputs: 1
 	File system outputs: 0

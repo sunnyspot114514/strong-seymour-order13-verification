@@ -29,6 +29,17 @@ certificates. Its external input is Brendan McKay's catalogue of all
 7. A separate Python program decoded the first tight witness and recomputed
    all thirteen matching sizes by exhaustive partial injections, then
    checked all Hall defects and the original catalogue record.
+8. All 61 exceptional classes were exported with a Hall defect for every
+   non-strong vertex and a perfect matching for every strong vertex. A
+   separate Python checker exhaustively recomputed all 793 rooted matching
+   instances and checked all 793 certificates.
+9. nauty 2.9.3 was downloaded from its official source and authenticated by
+   SHA-256 before `gentourng` and `labelg` were compiled. `gentourng` then
+   regenerated 1,495,297 regular tournaments without reading the static
+   catalogue and reproduced the exact distribution.
+10. Canonical `labelg` comparison showed that the 61 exceptional isomorphism
+    classes from the downloaded and regenerated streams were identical, with
+    the same strong count class by class.
 
 ## Environment
 
@@ -40,7 +51,7 @@ Python 3.10.12
 
 The optimized executable was built locally and was not committed. Its
 SHA-256 for the recorded run was
-`07cbf61ac0d05848588a307cc87b9c057bb227b186ee673a312421c283c21094`.
+`112365b3a2cea3b89df4c69bd855c8c5005619e959c90285fcb539411a38ce37`.
 
 ## Outcome
 
@@ -49,4 +60,6 @@ The minimum number of strong Seymour vertices was 11. It was attained by
 1,495,236 classes with all 13 vertices strong.
 
 This establishes an independent cross-check of the SAT reduction, subject
-to the catalogue trust boundary stated in [README.md](README.md).
+to the trust boundaries stated in [README.md](README.md). The generator
+rerun removes reliance on the integrity of the downloaded static catalogue
+file, though both data and generator remain in the McKay/nauty ecosystem.

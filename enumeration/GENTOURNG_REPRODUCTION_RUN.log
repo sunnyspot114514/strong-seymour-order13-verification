@@ -1,0 +1,9 @@
+[1/8] Obtain and authenticate the official nauty 2.9.3 source
+[2/8] Configure and compile gentourng and labelg from source
+[3/8] Compile the direct Hall/matching verifier
+[4/8] Generate all regular order-13 tournaments and verify the stream
+[5/8] Compare the deterministic gentourng artifacts
+[6/8] Independently verify all regenerated exceptional records
+[7/8] Compare summaries and canonical exceptional isomorphism classes
+[8/8] SUCCESS
+generated=1495297 distribution=11:13,12:48,13:1495236

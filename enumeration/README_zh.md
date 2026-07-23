@@ -57,7 +57,31 @@
 [RESULTS.json](RESULTS.json)。另一份 Python 验证器使用穷举部分单射和 Hall
 子集重新检查该实例，不调用 C++ 的匹配实现。
 
-## 一键复现
+## 全部 61 个异常类
+
+[EXCEPTIONAL_CLASSES.jsonl](EXCEPTIONAL_CLASSES.jsonl) 收录全部未达到 13 个
+strong 顶点的同构类：13 个 strong 数为 11 的类和 48 个 strong 数为 12
+的类。每条记录包含目录索引与编码、全部最大匹配数、每个非 strong 顶点的
+Hall 缺陷，以及每个 strong 顶点的一份显式完美匹配。
+
+独立 Python 检查器穷举重算了全部 793 个根匹配实例，并直接检查了 719
+份完美匹配证书和 74 份 Hall 缺陷。结果见
+[EXCEPTIONAL_VERIFICATION.json](EXCEPTIONAL_VERIFICATION.json)。
+
+## 使用 gentourng 独立重新生成
+
+从官方来源核验并编译 nauty 2.9.3 后运行：
+
+```bash
+gentourng -d6 -D6 13
+```
+
+生成器重新产生了 1,495,297 个非同构 tournament。将输出流直接送入验证器，
+再次得到完整的 `13 / 48 / 1,495,236` 分布。下载目录和重新生成流中的 61
+个异常类经 `labelg` 规范标号后集合完全相同，strong 数也逐类一致。详细来源
+与日志见 [GENTOURNG_PROVENANCE.md](GENTOURNG_PROVENANCE.md)。
+
+## 从下载目录一键复现
 
 需要 Bash、`curl`、`gzip`、GNU coreutils、支持 C++17 的 `g++`、Python 3
 以及 `/usr/bin/time`。
@@ -67,8 +91,26 @@ cd enumeration
 bash run_enumeration.sh
 ```
 
-脚本会下载并核验数据库、编译验证器、完整枚举、比较确定性的 JSON 结果，并独立复核第一个极值实例。生成物只写入已被 Git 忽略的 `enumeration/work/`。
+脚本会下载并核验数据库、编译验证器、完整枚举、比较确定性产物，并独立复核
+第一个极值实例和全部 61 个异常类。生成物只写入已被 Git 忽略的
+`enumeration/work/`。
+
+## 从生成器源码一键复现
+
+还需要 GNU Make 和 C 编译器。
+
+```bash
+cd enumeration
+bash run_gentourng.sh
+```
+
+该脚本会下载并认证 nauty 2.9.3 源码，编译 `gentourng` 和 `labelg`，重新
+生成完整非同构流，检查每个顶点，并规范比较两条路线得到的异常同构类。
 
 ## 可信边界
 
 这条路线独立于 SAT 编码，但依赖 McKay 同构类目录的完整性与正确性、公开的 78 位格式以及两套直接图算法。因此它是一条本质不同的强交叉验证，但不是对该数据库本身的独立重新生成。
+
+`gentourng` 运行消除了对已下载静态文件完整性的依赖，但仍属于 McKay/nauty
+软件生态。两种枚举方式共同依赖 strong Seymour 条件与根顶点 `6 x 6`
+完美匹配条件之间的数学等价。

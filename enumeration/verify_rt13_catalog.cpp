@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -20,6 +21,7 @@ struct VertexResult {
   std::uint8_t defect_neighbors = 0;
   std::array<int, SIDE> left{};
   std::array<int, SIDE> right{};
+  std::array<int, SIDE> match_left_to_right{};
 };
 
 struct Witness {
@@ -136,13 +138,21 @@ bool augment(int u, const std::array<std::uint8_t, SIDE>& rows,
   return false;
 }
 
-int maximum_matching_size(const std::array<std::uint8_t, SIDE>& rows) {
+int maximum_matching_size(
+    const std::array<std::uint8_t, SIDE>& rows,
+    std::array<int, SIDE>& match_left_to_right) {
   std::array<int, SIDE> match_right{};
   match_right.fill(-1);
+  match_left_to_right.fill(-1);
   int size = 0;
   for (int u = 0; u < SIDE; ++u) {
     std::uint8_t seen = 0;
     if (augment(u, rows, match_right, seen)) ++size;
+  }
+  for (int v = 0; v < SIDE; ++v) {
+    if (match_right[v] != -1) {
+      match_left_to_right[match_right[v]] = v;
+    }
   }
   return size;
 }
@@ -154,7 +164,8 @@ VertexResult check_vertex(const std::array<std::uint16_t, N>& out,
       build_bipartite_rows(out, root, result.left, result.right);
   result.strong = hall_has_perfect_matching(
       rows, result.defect_left_subset, result.defect_neighbors);
-  result.matching_size = maximum_matching_size(rows);
+  result.matching_size =
+      maximum_matching_size(rows, result.match_left_to_right);
   if (result.strong != (result.matching_size == SIDE)) {
     fail("Hall and augmenting-path implementations disagree");
   }
@@ -170,13 +181,13 @@ std::string adjacency_row(const std::array<std::uint16_t, N>& out, int v) {
   return row;
 }
 
-void print_int_array(const std::vector<int>& values) {
-  std::cout << '[';
+void print_int_array(std::ostream& output, const std::vector<int>& values) {
+  output << '[';
   for (std::size_t i = 0; i < values.size(); ++i) {
-    if (i) std::cout << ',';
-    std::cout << values[i];
+    if (i) output << ',';
+    output << values[i];
   }
-  std::cout << ']';
+  output << ']';
 }
 
 void print_witness(const Witness& witness) {
@@ -194,9 +205,9 @@ void print_witness(const Witness& witness) {
     matching_sizes.push_back(witness.vertices[v].matching_size);
   }
   std::cout << "    \"non_strong_vertices\": ";
-  print_int_array(non_strong);
+  print_int_array(std::cout, non_strong);
   std::cout << ",\n    \"matching_sizes\": ";
-  print_int_array(matching_sizes);
+  print_int_array(std::cout, matching_sizes);
   std::cout << ",\n";
 
   std::cout << "    \"adjacency_matrix\": [\n";
@@ -224,31 +235,116 @@ void print_witness(const Witness& witness) {
       }
     }
     std::cout << "      {\"vertex\":" << v << ",\"S\":";
-    print_int_array(subset);
+    print_int_array(std::cout, subset);
     std::cout << ",\"GammaS\":";
-    print_int_array(neighbors);
+    print_int_array(std::cout, neighbors);
     std::cout << '}';
   }
   std::cout << "\n    ]\n  }\n";
+}
+
+void print_exception_record(
+    std::ostream& output, std::uint64_t catalog_index,
+    const std::string& upper_triangle,
+    const std::array<VertexResult, N>& vertices, int strong_count) {
+  std::vector<int> non_strong;
+  std::vector<int> matching_sizes;
+  for (int v = 0; v < N; ++v) {
+    if (!vertices[v].strong) non_strong.push_back(v);
+    matching_sizes.push_back(vertices[v].matching_size);
+  }
+
+  output << "{\"catalog_index_1_based\":" << catalog_index
+         << ",\"upper_triangle\":\"" << upper_triangle
+         << "\",\"strong_count\":" << strong_count
+         << ",\"non_strong_vertices\":";
+  print_int_array(output, non_strong);
+  output << ",\"matching_sizes\":";
+  print_int_array(output, matching_sizes);
+
+  output << ",\"hall_defects\":[";
+  bool first_defect = true;
+  for (int v = 0; v < N; ++v) {
+    const auto& result = vertices[v];
+    if (result.strong) continue;
+    if (!first_defect) output << ',';
+    first_defect = false;
+    std::vector<int> subset;
+    std::vector<int> neighbors;
+    for (int i = 0; i < SIDE; ++i) {
+      if (result.defect_left_subset & (1u << i)) {
+        subset.push_back(result.left[i]);
+      }
+      if (result.defect_neighbors & (1u << i)) {
+        neighbors.push_back(result.right[i]);
+      }
+    }
+    output << "{\"vertex\":" << v << ",\"S\":";
+    print_int_array(output, subset);
+    output << ",\"GammaS\":";
+    print_int_array(output, neighbors);
+    output << '}';
+  }
+
+  output << "],\"perfect_matchings\":[";
+  bool first_matching = true;
+  for (int v = 0; v < N; ++v) {
+    const auto& result = vertices[v];
+    if (!result.strong) continue;
+    if (!first_matching) output << ',';
+    first_matching = false;
+    output << "{\"vertex\":" << v << ",\"edges\":[";
+    for (int i = 0; i < SIDE; ++i) {
+      const int matched_right = result.match_left_to_right[i];
+      if (matched_right < 0 || matched_right >= SIDE) {
+        fail("strong vertex is missing a perfect-matching edge");
+      }
+      if (i) output << ',';
+      output << '[' << result.left[i] << ','
+             << result.right[matched_right] << ']';
+    }
+    output << "]}";
+  }
+  output << "]}\n";
 }
 
 }  // namespace
 
 int main(int argc, char** argv) {
   std::uint64_t expected_records = EXPECTED_RECORDS;
-  if (argc == 3 && std::string(argv[1]) == "--expected-records") {
-    try {
-      expected_records = std::stoull(argv[2]);
-    } catch (...) {
-      fail("invalid value for --expected-records");
+  std::string exceptions_file;
+  for (int i = 1; i < argc; ++i) {
+    const std::string option = argv[i];
+    if (option == "--expected-records") {
+      if (++i >= argc) fail("--expected-records requires a value");
+      try {
+        expected_records = std::stoull(argv[i]);
+      } catch (...) {
+        fail("invalid value for --expected-records");
+      }
+      if (expected_records == 0) {
+        fail("expected record count must be positive");
+      }
+    } else if (option == "--exceptions-file") {
+      if (++i >= argc) fail("--exceptions-file requires a path");
+      exceptions_file = argv[i];
+      if (exceptions_file.empty()) fail("exceptions path must not be empty");
+    } else {
+      fail("usage: verify_rt13_catalog [--expected-records N] "
+           "[--exceptions-file PATH]");
     }
-    if (expected_records == 0) fail("expected record count must be positive");
-  } else if (argc != 1) {
-    fail("usage: verify_rt13_catalog [--expected-records N]");
   }
 
   std::ios::sync_with_stdio(false);
   std::cin.tie(nullptr);
+
+  std::ofstream exceptions_output;
+  if (!exceptions_file.empty()) {
+    exceptions_output.open(exceptions_file, std::ios::out | std::ios::trunc);
+    if (!exceptions_output) {
+      fail("cannot open exceptions file: " + exceptions_file);
+    }
+  }
 
   std::array<std::uint64_t, N + 1> distribution{};
   std::uint64_t records = 0;
@@ -271,6 +367,10 @@ int main(int argc, char** argv) {
       if (vertex_results[v].strong) ++strong_count;
     }
     ++distribution[strong_count];
+    if (exceptions_output && strong_count < N) {
+      print_exception_record(exceptions_output, records, line, vertex_results,
+                             strong_count);
+    }
 
     if (strong_count < minimum_strong) {
       minimum_strong = strong_count;

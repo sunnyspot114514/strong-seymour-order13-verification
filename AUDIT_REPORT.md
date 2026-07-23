@@ -48,6 +48,17 @@ The deterministic result reproduced byte-for-byte on a second full run.
 The first extremal catalogue witness was additionally verified by exhaustive
 partial injections in Python.
 
+All 61 classes with fewer than thirteen strong vertices were exported with
+one independently checked certificate per rooted vertex: 719 explicit
+perfect matchings and 74 Hall defects.
+
+Finally, official nauty 2.9.3 source was authenticated and compiled.
+`gentourng -d6 -D6 13` regenerated all 1,495,297 non-isomorphic regular
+tournaments without reading the static catalogue and reproduced the exact
+distribution. Freshly built `labelg` canonicalization confirmed that both
+routes contained the same 61 exceptional isomorphism classes, with identical
+strong counts class by class.
+
 ## Earlier existence-only audit
 
 The original solver and watched-literal checker were rebuilt from source.

@@ -1,0 +1,40 @@
+{
+  "catalog_records": 1495297,
+  "vertex_checks": 19438861,
+  "all_records_valid_6_regular_tournaments": true,
+  "hall_and_augmenting_path_agree_everywhere": true,
+  "minimum_strong_vertices": 11,
+  "maximum_non_strong_vertices": 2,
+  "minimum_isomorphism_class_count": 13,
+  "strong_count_distribution_unlabelled": {
+    "11": 13,
+    "12": 48,
+    "13": 1495236
+  },
+  "first_minimum_witness": {
+    "catalog_index_1_based": 244003,
+    "upper_triangle": "111110000100110111100001111110000111111000111110001111110101111111111111111111",
+    "strong_count": 11,
+    "non_strong_vertices": [5,9],
+    "matching_sizes": [6,6,6,6,6,5,6,6,6,5,6,6,6],
+    "adjacency_matrix": [
+      "0111110000100",
+      "0011011110000",
+      "0001111110000",
+      "0000111111000",
+      "0100011111000",
+      "0000001111110",
+      "1000000101111",
+      "1000000011111",
+      "1000001001111",
+      "1110000000111",
+      "0111100000011",
+      "1111100000001",
+      "1111110000000"
+    ],
+    "hall_defects": [
+      {"vertex":5,"S":[6,7,8],"GammaS":[0,12]},
+      {"vertex":9,"S":[0,10,11,12],"GammaS":[3,4,5]}
+    ]
+  }
+}

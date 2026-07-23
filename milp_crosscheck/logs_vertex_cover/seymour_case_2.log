@@ -1,0 +1,50 @@
+case=2, variables=390, constraints=2078, nnz=9696
+Running HiGHS 1.8.0 (git hash: 222cce7): Copyright (c) 2024 HiGHS under MIT licence terms
+Coefficient ranges:
+  Matrix [1e+00, 1e+00]
+  Cost   [0e+00, 0e+00]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 6e+00]
+Presolving model
+1248 rows, 306 cols, 5556 nonzeros  0s
+915 rows, 259 cols, 3816 nonzeros  0s
+Objective function is integral with scale 1
+
+Solving MIP model with:
+   915 rows
+   259 cols (259 binary, 0 integer, 0 implied int., 0 continuous)
+   3816 nonzeros
+MIP-Timing:       0.019 - starting analytic centre calculation
+
+Src: B => Branching; C => Central rounding; F => Feasibility pump; H => Heuristic; L => Sub-MIP;
+     P => Empty MIP; R => Randomized rounding; S => Solve LP; T => Evaluate node; U => Unbounded;
+     z => Trivial zero; l => Trivial lower; u => Trivial upper; p => Trivial point
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work
+Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   0               inf                  inf        0      0      0         0     0.0s
+         1       0         1 100.00%   inf             inf                  inf        0      0      0       202     0.0s
+
+Solving report
+  Status            Infeasible
+  Primal bound      inf
+  Dual bound        inf
+  Gap               inf
+  P-D integral      0
+  Solution status   -
+  Timing            0.04 (total)
+                    0.00 (presolve)
+                    0.00 (solve)
+                    0.00 (postsolve)
+  Max sub-MIP depth 0
+  Nodes             1
+  Repair LPs        0 (0 feasible; 0 iterations)
+  LP iterations     202 (total)
+                    0 (strong br.)
+                    0 (separation)
+                    0 (heuristics)
+status 2
+message The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)
+success False
+fun None

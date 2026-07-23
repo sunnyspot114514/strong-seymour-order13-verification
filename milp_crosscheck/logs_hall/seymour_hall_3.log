@@ -1,0 +1,58 @@
+case=3 vars=390 cons=2072 nnz=7974
+Running HiGHS 1.8.0 (git hash: 222cce7): Copyright (c) 2024 HiGHS under MIT licence terms
+Coefficient ranges:
+  Matrix [1e+00, 1e+00]
+  Cost   [0e+00, 0e+00]
+  Bound  [1e+00, 1e+00]
+  RHS    [1e+00, 6e+00]
+Presolving model
+1699 rows, 348 cols, 6438 nonzeros  0s
+1699 rows, 348 cols, 6438 nonzeros  0s
+Objective function is integral with scale 1
+
+Solving MIP model with:
+   1699 rows
+   348 cols (348 binary, 0 integer, 0 implied int., 0 continuous)
+   6438 nonzeros
+MIP-Timing:       0.042 - starting analytic centre calculation
+
+Src: B => Branching; C => Central rounding; F => Feasibility pump; H => Heuristic; L => Sub-MIP;
+     P => Empty MIP; R => Randomized rounding; S => Solve LP; T => Evaluate node; U => Unbounded;
+     z => Trivial zero; l => Trivial lower; u => Trivial upper; p => Trivial point
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work
+Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   0               inf                  inf        0      0      0         0     0.0s
+         0       0         0   0.00%   0               inf                  inf        0      0      2       258     0.1s
+
+7.8% inactive integer columns, restarting
+Model after restart has 1393 rows, 321 cols (321 bin., 0 int., 0 impl., 0 cont.), and 5142 nonzeros
+
+MIP-Timing:         3.1 - starting analytic centre calculation
+         0       0         0   0.00%   0               inf                  inf       24      0      0     18597     3.1s
+         0       0         0   0.00%   0               inf                  inf       24      5      2     18631     3.1s
+       512      12       234  28.22%   0               inf                  inf     2239      5   1765     68586     8.1s
+      1030       0       473 100.00%   inf             inf                  inf     4361     12   3693    114078    11.6s
+
+Solving report
+  Status            Infeasible
+  Primal bound      inf
+  Dual bound        inf
+  Gap               inf
+  P-D integral      0
+  Solution status   -
+  Timing            11.57 (total)
+                    0.00 (presolve)
+                    0.00 (solve)
+                    0.00 (postsolve)
+  Max sub-MIP depth 4
+  Nodes             1030
+  Repair LPs        0 (0 feasible; 0 iterations)
+  LP iterations     114078 (total)
+                    0 (strong br.)
+                    2646 (separation)
+                    32656 (heuristics)
+status 2
+message The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)
+success False

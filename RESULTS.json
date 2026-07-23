@@ -1,0 +1,39 @@
+{
+  "claim": "No 13-vertex regular tournament has every vertex non-strong Seymour",
+  "consequence_with_paper_theorem": "Every oriented graph on at most 13 vertices has a strong Seymour vertex",
+  "encoding": {
+    "branches": 6,
+    "branch_parameter": "p = number of left-side vertices in a size-5 cover for root vertex 0",
+    "variables_per_branch": 3601,
+    "clauses_per_branch": 8656
+  },
+  "rup_steps": {
+    "case0": 1,
+    "case1": 1,
+    "case2": 817,
+    "case3": 630,
+    "case4": 1,
+    "case5": 1
+  },
+  "verification": {
+    "watched_literal_rup_checker": "verified all six branches",
+    "independent_full_scan_rup_checker": "verified all six branches",
+    "debian_drat_trim": "verified all six branches",
+    "vertex_cover_milp": "all six branches infeasible",
+    "hall_witness_milp": "all six branches infeasible",
+    "satisfiable_negative_controls": "verified"
+  },
+  "reproduction_environment": {
+    "os": "Ubuntu 22.04.5 LTS under WSL2",
+    "python": "3.10.12",
+    "gpp": "11.4.0",
+    "scipy": "1.15.3",
+    "numpy": "2.2.6",
+    "drat_trim": "0.0~git20240428.effa1dc-2"
+  },
+  "limitations": [
+    "not a proof of the conjecture for arbitrary order",
+    "not externally peer reviewed",
+    "the graph-theoretic conclusion relies on the reduction and CNF generator"
+  ]
+}

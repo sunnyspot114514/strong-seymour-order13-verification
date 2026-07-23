@@ -1,0 +1,12 @@
+/build/
+/regenerated/
+/milp_results/
+/.venv/
+/venv/
+__pycache__/
+*.pyc
+*.exe
+*.o
+*.obj
+.DS_Store
+Thumbs.db

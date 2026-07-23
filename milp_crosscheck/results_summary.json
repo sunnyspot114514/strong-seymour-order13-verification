@@ -1,0 +1,24 @@
+{
+  "problem": "Strong Seymour vertex conjecture for oriented graphs of order at most 13",
+  "remaining_case": "13-vertex regular tournaments",
+  "vertex_cover_cases": {
+    "0": "infeasible",
+    "1": "infeasible",
+    "2": "infeasible",
+    "3": "infeasible",
+    "4": "infeasible",
+    "5": "infeasible"
+  },
+  "hall_witness_sizes": {
+    "1": "infeasible",
+    "2": "infeasible",
+    "3": "infeasible",
+    "4": "infeasible",
+    "5": "infeasible",
+    "6": "infeasible"
+  },
+  "vertex_cover_no_presolve": "all six cases infeasible",
+  "negative_control": "feasible regular tournaments with one specified non-strong vertex were generated and independently verified",
+  "solver": "HiGHS 1.8.0 via scipy.optimize.milp",
+  "formal_certificate": false
+}

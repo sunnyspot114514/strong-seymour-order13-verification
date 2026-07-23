@@ -1,0 +1,4 @@
+UNSAT conflicts=0 decisions=0 props=513 sec=9.7099e-05
+Command exited with non-zero status 20
+solve_elapsed=0:00.00 solve_rss=5344KB
+case4 solver rc=20

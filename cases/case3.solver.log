@@ -1,0 +1,4 @@
+UNSAT conflicts=630 decisions=950 props=100309 sec=0.0128475
+Command exited with non-zero status 20
+solve_elapsed=0:00.01 solve_rss=5340KB
+case3 solver rc=20

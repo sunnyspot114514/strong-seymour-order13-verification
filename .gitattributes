@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+*.cnf text eol=lf
+*.rup text eol=lf
+*.model text eol=lf
+*.log text eol=lf
+*.out text eol=lf

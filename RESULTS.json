@@ -1,38 +1,33 @@
 {
-  "claim": "No 13-vertex regular tournament has every vertex non-strong Seymour",
-  "consequence_with_paper_theorem": "Every oriented graph on at most 13 vertices has a strong Seymour vertex",
-  "encoding": {
-    "branches": 6,
-    "branch_parameter": "p = number of left-side vertices in a size-5 cover for root vertex 0",
-    "variables_per_branch": 3601,
-    "clauses_per_branch": 8656
+  "theorem": "Every regular tournament on 13 vertices has at least 11 strong Seymour vertices.",
+  "tight": true,
+  "minimum_strong_vertices": 11,
+  "maximum_non_strong_vertices": 2,
+  "upper_bound_proof": {
+    "statement": "No 13-vertex regular tournament has at least 3 non-strong vertices.",
+    "normalized_branches": 6,
+    "rup_steps": [1, 1, 19031, 19236, 1, 1],
+    "verification": {
+      "watched_literal_cpp_rup_checker": "verified all six branches",
+      "full_scan_occurrence_cpp_rup_checker": "verified all six branches",
+      "debian_drat_trim": "verified all six branches"
+    }
   },
-  "rup_steps": {
-    "case0": 1,
-    "case1": 1,
-    "case2": 817,
-    "case3": 630,
-    "case4": 1,
-    "case5": 1
+  "tight_witness": {
+    "non_strong_vertices": [0, 5],
+    "matching_sizes": [5, 6, 6, 6, 6, 5, 6, 6, 6, 6, 6, 6, 6],
+    "adjacency_matrix_sha256": "8f7926e1544e8bc087fbce2595754b7a9c30719be7ced398368c053cf45c09fb"
   },
-  "verification": {
-    "watched_literal_rup_checker": "verified all six branches",
-    "independent_full_scan_rup_checker": "verified all six branches",
-    "debian_drat_trim": "verified all six branches",
-    "vertex_cover_milp": "all six branches infeasible",
-    "hall_witness_milp": "all six branches infeasible",
-    "satisfiable_negative_controls": "verified"
-  },
+  "source_archive_sha256": "a4ca8b8d0ab5c262b0baf92eea32826d770a1892d40b4428d27756916414b7c8",
   "reproduction_environment": {
     "os": "Ubuntu 22.04.5 LTS under WSL2",
     "python": "3.10.12",
     "gpp": "11.4.0",
-    "scipy": "1.15.3",
-    "numpy": "2.2.6",
     "drat_trim": "0.0~git20240428.effa1dc-2"
   },
+  "baseline_existence_experiment": "preserved in the repository root",
   "limitations": [
-    "not a proof of the conjecture for arbitrary order",
+    "finite order-13 result only",
     "not externally peer reviewed",
     "the graph-theoretic conclusion relies on the reduction and CNF generator"
   ]

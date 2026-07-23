@@ -1,0 +1,76 @@
+[1/5] Compile solver and two independent RUP checkers
+[2/5] Regenerate and solve all six branches for >=3 non-strong vertices
+{"min_failures": 3, "root_cover_left_count": 0, "vars": 3734, "clauses": 8890, "orientation_vars": 78, "failure_vars": [79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91]}
+RUP VERIFIED steps=1 empty=1 clauses=8891
+SCAN RUP VERIFIED steps=1 empty=1 clauses=8891
+{"min_failures": 3, "root_cover_left_count": 1, "vars": 3734, "clauses": 8890, "orientation_vars": 78, "failure_vars": [79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91]}
+RUP VERIFIED steps=1 empty=1 clauses=8891
+SCAN RUP VERIFIED steps=1 empty=1 clauses=8891
+{"min_failures": 3, "root_cover_left_count": 2, "vars": 3734, "clauses": 8890, "orientation_vars": 78, "failure_vars": [79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91]}
+RUP VERIFIED steps=19031 empty=1 clauses=27921
+SCAN RUP VERIFIED steps=19031 empty=1 clauses=27921
+{"min_failures": 3, "root_cover_left_count": 3, "vars": 3734, "clauses": 8890, "orientation_vars": 78, "failure_vars": [79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91]}
+RUP VERIFIED steps=19236 empty=1 clauses=28126
+SCAN RUP VERIFIED steps=19236 empty=1 clauses=28126
+{"min_failures": 3, "root_cover_left_count": 4, "vars": 3734, "clauses": 8890, "orientation_vars": 78, "failure_vars": [79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91]}
+RUP VERIFIED steps=1 empty=1 clauses=8891
+SCAN RUP VERIFIED steps=1 empty=1 clauses=8891
+{"min_failures": 3, "root_cover_left_count": 5, "vars": 3734, "clauses": 8890, "orientation_vars": 78, "failure_vars": [79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91]}
+RUP VERIFIED steps=1 empty=1 clauses=8891
+SCAN RUP VERIFIED steps=1 empty=1 clauses=8891
+[3/5] Regenerate a tight witness with >=2 non-strong vertices
+{"min_failures": 2, "root_cover_left_count": 2, "vars": 3746, "clauses": 8912, "orientation_vars": 78, "failure_vars": [79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91]}
+[4/5] Verify archive hashes
+./README_zh.md: OK
+./RESULTS.json: OK
+./certificates/m3_p0.cnf: OK
+./certificates/m3_p0.json: OK
+./certificates/m3_p0.rup: OK
+./certificates/m3_p0.rupcheck.log: OK
+./certificates/m3_p0.scancheck.log: OK
+./certificates/m3_p0.solver.log: OK
+./certificates/m3_p1.cnf: OK
+./certificates/m3_p1.json: OK
+./certificates/m3_p1.rup: OK
+./certificates/m3_p1.rupcheck.log: OK
+./certificates/m3_p1.scancheck.log: OK
+./certificates/m3_p1.solver.log: OK
+./certificates/m3_p2.cnf: OK
+./certificates/m3_p2.json: OK
+./certificates/m3_p2.rup: OK
+./certificates/m3_p2.rupcheck.log: OK
+./certificates/m3_p2.scancheck.log: OK
+./certificates/m3_p2.solver.log: OK
+./certificates/m3_p3.cnf: OK
+./certificates/m3_p3.json: OK
+./certificates/m3_p3.rup: OK
+./certificates/m3_p3.rupcheck.log: OK
+./certificates/m3_p3.scancheck.log: OK
+./certificates/m3_p3.solver.log: OK
+./certificates/m3_p4.cnf: OK
+./certificates/m3_p4.json: OK
+./certificates/m3_p4.rup: OK
+./certificates/m3_p4.rupcheck.log: OK
+./certificates/m3_p4.scancheck.log: OK
+./certificates/m3_p4.solver.log: OK
+./certificates/m3_p5.cnf: OK
+./certificates/m3_p5.json: OK
+./certificates/m3_p5.rup: OK
+./certificates/m3_p5.rupcheck.log: OK
+./certificates/m3_p5.scancheck.log: OK
+./certificates/m3_p5.solver.log: OK
+./run_all.sh: OK
+./src/analyze_tight_instance.py: OK
+./src/cdcl.cpp: OK
+./src/generate_extremal_cnf.py: OK
+./src/rupcheck.cpp: OK
+./src/scan_rupcheck.cpp: OK
+./tight/m2_p2.cnf: OK
+./tight/m2_p2.json: OK
+./tight/m2_p2.model: OK
+./tight/m2_p2.solver.log: OK
+./tight/tight_instance_analysis.json: OK
+[5/5] SUCCESS
+Certified exact extremal value: minimum strong vertices = 11, maximum non-strong vertices = 2.
+
+TOTAL time=0:33.03 rss=233384KB

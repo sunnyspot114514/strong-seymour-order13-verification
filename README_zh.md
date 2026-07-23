@@ -1,96 +1,66 @@
-# 强 Seymour 猜想：13 阶精确计算验证
+# 13 阶正则 tournament 中 strong Seymour 顶点数量的精确极值
 
-本仓库给出下列有限命题的可复现计算机辅助验证：
+本仓库给出以下精确有限结论的可复现计算机辅助验证：
 
-> 每个 13 阶正则 tournament 都至少包含一个 strong Seymour vertex。
+> **每个 13 阶正则 tournament 至少包含 11 个 strong Seymour 顶点，而且这个下界是紧的。**
 
-结合 Bai、Li、Park 的论文
-[*Towards a strengthening of the second neighborhood conjecture*](https://arxiv.org/abs/2607.18047)
-中关于 `δ+(D) ≤ 5` 的定理，可以推出：
+等价地说，非 strong Seymour 顶点最多有 2 个，并且仓库中给出了一张恰好达到 2 个的 tournament。
 
-> 每个顶点数不超过 13 的 oriented graph 都包含 strong Seymour vertex。
+强化实验、证书与紧致实例位于 [`extremal/`](extremal/)。
 
-## 数学化约
+## 证据摘要
 
-13 阶 oriented graph 若不能被 `δ+(D) ≤ 5` 的定理覆盖，则每个顶点的
-出度至少为 6。出度总和至少为 `13×6=78`，而 13 个顶点之间至多只有
-`C(13,2)=78` 条弧。因此所有等号必须同时成立：该图是每个顶点出度都
-恰好为 6 的正则 tournament。
+上界实验检验是否存在至少 3 个非 strong 顶点的 13 阶正则 tournament。任选一个失败顶点作为根，并规范化其补齐到大小 5 的顶点覆盖后，所有候选反例必落入 `p=0,...,5` 六个分支之一。六个分支全部 UNSAT：
 
-在这种 tournament 中固定顶点 `x`：
+| 根分支 `p` | 结果 | RUP 步数 |
+|---:|---|---:|
+| 0 | UNSAT | 1 |
+| 1 | UNSAT | 1 |
+| 2 | UNSAT | 19031 |
+| 3 | UNSAT | 19236 |
+| 4 | UNSAT | 1 |
+| 5 | UNSAT | 1 |
 
-- `|N+(x)| = |N-(x)| = 6`；
-- `N++(x) = N-(x)`；
-- `x` 是 strong Seymour vertex，当且仅当从 `N+(x)` 到 `N-(x)` 的
-  二部图存在大小为 6 的完美匹配。
+每份证明均通过：
 
-由 König 定理，`x` 不是 strong 当且仅当这个二部图存在大小至多为 5
-的顶点覆盖。反例要求 13 个顶点全部拥有这种失败证书。
+- 包内 watched-literal C++ RUP 检查器；
+- 独立实现的 full-scan/occurrence C++ RUP 检查器；
+- 独立审计中 Debian `drat-trim` 0.0~git20240428.effa1dc-2 的第三方检查。
 
-利用重新编号固定顶点 0 的六个出邻点和六个入邻点。把顶点 0 的一个
-大小为 5 的覆盖中左侧顶点数记为 `p`，则只需检查：
+达到下界的实例的 13 个最大匹配数为：
 
 ```text
-p = 0, 1, 2, 3, 4, 5
+[5, 6, 6, 6, 6, 5, 6, 6, 6, 6, 6, 6, 6]
 ```
 
-这六种证书形状覆盖所有可能。六个 CNF 分支全部不可满足。
+所以只有顶点 0 和 5 非 strong，其他 11 个顶点均为 strong；两者的显式 Hall 缺陷证书均已公开。
 
-## 仓库内容
+## 一键复现强化实验
 
-- `generate_cnf.py`：确定性生成六个 CNF；
-- `cdcl.cpp`：输出 RUP 证明的小型 CDCL 求解器；
-- `rupcheck.cpp`：watched-literal RUP 检查器；
-- `naive_rupcheck.py`：独立的全扫描单位传播检查器；
-- `cases/`：公开的 CNF、RUP 证明、元数据与检查日志；
-- `generate_control.py`、`verify_control.py`：可满足反向对照；
-- `milp_crosscheck/`：顶点覆盖与 Hall 缺陷集两套 MILP 模型；
-- `AUDIT_REPORT.md`：Ubuntu 22.04 与第三方检查器的独立复核报告；
-- `RESULTS.json`：机器可读结果摘要。
-
-仓库不包含预编译可执行文件、虚拟环境、本机绝对路径、用户名或原工作
-目录信息。
-
-## 一键复现 SAT 验证
-
-需要 Python 3、`g++` 和 Bash。在仓库根目录运行：
+需要 Python 3、Bash 和支持 C++17 的 `g++`。`drat-trim` 可选但建议安装。
 
 ```bash
-./run_all.sh
+cd extremal
+bash run_all.sh
 ```
 
-脚本只使用仓库相对路径。它会：
+脚本从源码重新编译，重新生成全部 CNF、证明、模型与分析文件，运行两套内置证明检查器及可选的 `drat-trim`，并逐一比较发布文件与重生成文件。
 
-1. 从源码编译求解器和检查器；
-2. 重新生成六个 CNF；
-3. 重新求解并生成 RUP 证明；
-4. 使用两个实现方式不同的检查器核验证明；
-5. 验证一个可满足的反向对照；
-6. 如果系统 `PATH` 中存在 `drat-trim`，再进行第三方验证。
+数学归约见 [`extremal/README_zh.md`](extremal/README_zh.md)，独立 WSL/Ubuntu 复核见 [`extremal/AUDIT_REPORT.md`](extremal/AUDIT_REPORT.md)。
 
-所有生成物只写入已被 Git 忽略的 `build/` 与 `regenerated/`。
+## 保留的早期基线实验
 
-## 复现 MILP 交叉验证
-
-在独立环境中安装 NumPy、SciPy，然后运行：
+仓库根目录仍保留早期“至少存在 1 个 strong 顶点”的验证包及其 MILP 交叉验证：
 
 ```bash
-./run_milp_all.sh
+bash run_all.sh
+bash run_milp_all.sh
 ```
 
-它会执行：
-
-- 顶点覆盖编码的六个分支 `p=0,...,5`；
-- Hall 缺陷集编码的六个分支 `|S|=1,...,6`；
-- 三个可满足反向对照矩阵的直接匹配与 Hall 子集检查。
-
-十二个完整反例分支均应报告 `status 2` / `infeasible`。
+结合 Bai、Li、Park 论文
+[*Towards a strengthening of the second neighborhood conjecture*](https://arxiv.org/abs/2607.18047)
+中的定理，可推出所有不超过 13 个顶点的 oriented graph 至少有一个 strong Seymour vertex。强化后的“至少 11 个”只适用于 13 阶正则 tournament，不能直接推广到所有小阶 oriented graph。
 
 ## 结论边界
 
-这证明的是 13 阶及以下的有限情形，不是任意阶 strong Seymour 猜想的
-一般证明。RUP 证书证明了公开 CNF 的不可满足性；图论结论还依赖于上述
-数学化约和 CNF 生成器的正确性。
-
-若希望进一步缩小可信基，可以生成 LRAT 证书并使用形式化验证过的
-LRAT checker。
+这是尚未经过同行评审的有限计算机辅助结果。RUP 证书证明所发布 CNF 不可满足；图论结论还依赖于文档中的数学归约以及 CNF 生成器的正确性。仓库不包含预编译可执行文件、虚拟环境、本机绝对路径、用户名或原工作目录。

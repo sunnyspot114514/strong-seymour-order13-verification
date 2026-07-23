@@ -1,0 +1,22 @@
+{
+  "min_failures": 2,
+  "root_cover_left_count": 2,
+  "vars": 3746,
+  "clauses": 8912,
+  "orientation_vars": 78,
+  "failure_vars": [
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91
+  ]
+}

@@ -14,7 +14,11 @@
       {"p":4,"status":"UNSAT","rup_steps":1},
       {"p":5,"status":"UNSAT","rup_steps":1}
     ],
-    "checkers": ["watched-literal C++ RUP checker", "independent full-scan/occurrence C++ RUP checker"]
+    "checkers": [
+      "watched-literal C++ RUP checker",
+      "independent full-scan/occurrence C++ RUP checker",
+      "upstream drat-trim commit 2e3b2dc0ecf938addbd779d42877b6ed69d9a985 in RUP-only mode"
+    ]
   },
   "tight_witness": {
     "status": "SAT",

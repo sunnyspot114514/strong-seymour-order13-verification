@@ -49,6 +49,27 @@ All six UNSAT branches were accepted by:
 | 4 | verified | verified | verified |
 | 5 | verified | verified | verified |
 
+The official upstream source was also cloned independently and compiled
+using the command from its Makefile:
+
+```text
+gcc drat-trim.c -std=c99 -O2 -o drat-trim
+```
+
+The audited upstream build was:
+
+```text
+repository:    https://github.com/marijnheule/drat-trim.git
+commit:        2e3b2dc0ecf938addbd779d42877b6ed69d9a985
+compiler:      GCC 11.4.0
+binary SHA256: b535cc5334e97fba5b5db6013625c5a0b16ce348a98d59ff91b45a83fa56b39e
+mode:          -U (RUP-only)
+```
+
+All six upstream-checker processes exited with code zero, reported
+`s VERIFIED`, and reported zero RAT lemmas. Complete logs are in
+`upstream_drat_trim/`.
+
 The Debian `drat-trim` package used in the audit had SHA-256:
 
 ```text

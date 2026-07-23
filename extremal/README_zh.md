@@ -1,5 +1,7 @@
 # 13 阶正则 tournament 中 strong Seymour 顶点数量的精确极值
 
+[US English](README.md) | [CN 中文说明](README_zh.md)
+
 ## 核心结论
 
 本包给出一个可复核的计算机辅助证明：
@@ -32,7 +34,7 @@ N^{++}(x)=N^-(x).
 
 “至少 3 个非 strong 顶点”的六个分支结果为：
 
-| 根覆盖左侧数 \(p\) | 状态 | RUP 步数 |
+| 根覆盖左侧数 \(p\) | 状态 | RUP 证明行数（含终止空子句 `0`） |
 |---:|---|---:|
 | 0 | UNSAT | 1 |
 | 1 | UNSAT | 1 |
@@ -47,6 +49,11 @@ N^{++}(x)=N^-(x).
 2. full-scan/occurrence C++ 检查器。
 
 若系统安装了 `drat-trim`，`run_all.sh` 还会自动以 `-U` 模式执行第三方 RUP 检查。
+
+独立审计还以 GCC 11.4.0 从源码编译了上游官方检查器提交
+`2e3b2dc0ecf938addbd779d42877b6ed69d9a985`。六份证明在 RUP-only
+模式（`-U`）下均以退出码 0 结束并报告 `s VERIFIED`，RAT 引理数均为 0。
+逐分支完整日志和构建来源见 `upstream_drat_trim/`。
 
 ## 紧致实例
 
@@ -96,6 +103,7 @@ bash run_all.sh
 - `src/analyze_tight_instance.py`：独立检查紧致实例的正则性、匹配和 Hall 缺陷；
 - `certificates/`：六个 UNSAT 实例和 RUP 证明；
 - `tight/`：达到下界 11 的 SAT 实例；
+- `upstream_drat_trim/`：上游官方检查器来源、构建信息和六份完整日志；
 - `RESULTS.json`：机器可读结果摘要。
 
 ## 结论的准确表述

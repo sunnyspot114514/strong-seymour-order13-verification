@@ -20,6 +20,10 @@ The earlier existence-only SAT and MILP audit remains preserved below.
 - The complete package was rebuilt and rerun under Ubuntu 22.04.5 on WSL2.
 - All six regenerated CNFs and RUP proofs matched the published artifacts.
 - Both bundled C++ RUP checkers accepted all six proofs.
+- The upstream `drat-trim` checker at commit
+  `2e3b2dc0ecf938addbd779d42877b6ed69d9a985`, compiled from source with
+  GCC 11.4.0 and run with `-U`, accepted all six proofs with zero RAT
+  lemmas.
 - Debian `drat-trim` 0.0~git20240428.effa1dc-2 independently accepted all
   six proofs.
 - A separate brute-force matching implementation confirmed the tight

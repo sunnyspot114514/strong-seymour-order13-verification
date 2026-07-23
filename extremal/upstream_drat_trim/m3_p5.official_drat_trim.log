@@ -1,0 +1,21 @@
+c checker_repository https://github.com/marijnheule/drat-trim.git
+c checker_commit 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
+c checker_binary_sha256 b535cc5334e97fba5b5db6013625c5a0b16ce348a98d59ff91b45a83fa56b39e
+c command drat-trim certificates/m3_p5.cnf certificates/m3_p5.rup -U
+
+c parsing input formula with 3734 variables and 8890 clauses
+
+c finished parsing
+
+c UNSAT via unit propagation on the input instance
+
+c 33 of 8890 clauses in core                            
+
+c 1 of 2 lemmas in core using 33 resolution steps
+
+c 0 RAT lemmas in core; 0 redundant literals in core lemmas
+
+s VERIFIED
+
+c verification time: 0.079 seconds
+c process_exit_code 0

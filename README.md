@@ -96,6 +96,4 @@ eleven applies specifically to 13-vertex regular tournaments.
 This is a finite computer-assisted result and has not been peer reviewed.
 The RUP certificates establish unsatisfiability of the published CNFs. The
 graph-theoretic conclusion additionally relies on the documented reduction
-and the correctness of the CNF generator. No precompiled executable,
-virtual environment, local absolute path, user name, or host-specific
-working directory is published.
+and the correctness of the CNF generator.

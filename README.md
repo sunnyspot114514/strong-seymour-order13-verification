@@ -1,4 +1,6 @@
-# Exact Strong Seymour extremum at order 13
+# Exact Strong Seymour Extremum at Order 13
+
+[US English](README.md) | [CN 中文说明](README_zh.md)
 
 This repository contains a reproducible computer-assisted verification of
 the following exact finite result:
@@ -9,8 +11,7 @@ the following exact finite result:
 Equivalently, such a tournament has at most two non-strong vertices, and a
 tournament attaining two is included.
 
-Chinese documentation is available in [README_zh.md](README_zh.md). The
-strengthened experiment, certificates, and tight witness are in
+The strengthened experiment, certificates, and tight witness are in
 [`extremal/`](extremal/).
 
 ## Evidence at a glance
@@ -20,7 +21,7 @@ have at least three non-strong vertices. After choosing one failing vertex
 as root and normalizing a padded size-five vertex cover, every candidate
 falls into one of six branches `p = 0,...,5`. All six branches are UNSAT.
 
-| Root branch `p` | Status | RUP steps |
+| Root branch `p` | Status | RUP proof lines, including terminal `0` |
 |---:|---|---:|
 | 0 | UNSAT | 1 |
 | 1 | UNSAT | 1 |
@@ -33,7 +34,11 @@ Each proof was accepted by:
 
 - the included watched-literal C++ RUP checker;
 - the independently implemented full-scan/occurrence C++ RUP checker;
-- Debian `drat-trim` 0.0~git20240428.effa1dc-2 in an independent audit.
+- upstream `drat-trim` at commit
+  `2e3b2dc0ecf938addbd779d42877b6ed69d9a985`, compiled with GCC 11.4.0
+  and run in RUP-only mode (`-U`): all six branches reported `s VERIFIED`
+  with zero RAT lemmas;
+- Debian `drat-trim` 0.0~git20240428.effa1dc-2 in a separate audit.
 
 Sharpness is witnessed by the included regular tournament with matching
 sizes

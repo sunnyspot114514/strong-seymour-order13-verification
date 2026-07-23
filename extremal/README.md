@@ -1,5 +1,7 @@
 # Exact extremal verification
 
+[US English](README.md) | [CN 中文说明](README_zh.md)
+
 ## Result
 
 > Every regular tournament on 13 vertices contains at least eleven strong
@@ -27,7 +29,7 @@ exhaustive. Every branch is UNSAT.
 
 ## Certificates
 
-| Root branch `p` | Status | RUP steps |
+| Root branch `p` | Status | RUP proof lines, including terminal `0` |
 |---:|---|---:|
 | 0 | UNSAT | 1 |
 | 1 | UNSAT | 1 |
@@ -43,6 +45,12 @@ The published proofs are checked by two included implementations:
 
 When `drat-trim` is on `PATH`, the reproduction script also invokes it in
 RUP-only mode.
+
+An independent audit additionally compiled the upstream checker at commit
+`2e3b2dc0ecf938addbd779d42877b6ed69d9a985` with GCC 11.4.0. All six
+proofs exited successfully and reported `s VERIFIED` in RUP-only mode
+(`-U`), with zero RAT lemmas. Complete per-branch logs and build provenance
+are in `upstream_drat_trim/`.
 
 ## Sharp witness
 
@@ -86,6 +94,7 @@ outputs with the published artifacts.
 - `tight/`: satisfiable sharp witness and its analysis;
 - `RESULTS.json`: machine-readable summary;
 - `AUDIT_REPORT.md`: independent reproduction and third-party-checker audit;
+- `upstream_drat_trim/`: upstream checker provenance and six complete logs;
 - `INDEPENDENT_REPRODUCTION.log`: raw successful WSL run including all
   `drat-trim` checks.
 

@@ -10,6 +10,7 @@
     "verification": {
       "watched_literal_cpp_rup_checker": "verified all six branches",
       "full_scan_occurrence_cpp_rup_checker": "verified all six branches",
+      "upstream_drat_trim_commit_2e3b2dc": "verified all six branches in RUP-only mode with zero RAT lemmas",
       "debian_drat_trim": "verified all six branches"
     }
   },

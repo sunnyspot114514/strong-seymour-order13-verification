@@ -1,5 +1,7 @@
 # 13 阶正则 tournament 中 strong Seymour 顶点数量的精确极值
 
+[US English](README.md) | [CN 中文说明](README_zh.md)
+
 本仓库给出以下精确有限结论的可复现计算机辅助验证：
 
 > **每个 13 阶正则 tournament 至少包含 11 个 strong Seymour 顶点，而且这个下界是紧的。**
@@ -12,7 +14,7 @@
 
 上界实验检验是否存在至少 3 个非 strong 顶点的 13 阶正则 tournament。任选一个失败顶点作为根，并规范化其补齐到大小 5 的顶点覆盖后，所有候选反例必落入 `p=0,...,5` 六个分支之一。六个分支全部 UNSAT：
 
-| 根分支 `p` | 结果 | RUP 步数 |
+| 根分支 `p` | 结果 | RUP 证明行数（含终止空子句 `0`） |
 |---:|---|---:|
 | 0 | UNSAT | 1 |
 | 1 | UNSAT | 1 |
@@ -25,7 +27,10 @@
 
 - 包内 watched-literal C++ RUP 检查器；
 - 独立实现的 full-scan/occurrence C++ RUP 检查器；
-- 独立审计中 Debian `drat-trim` 0.0~git20240428.effa1dc-2 的第三方检查。
+- 上游官方 `drat-trim` 提交
+  `2e3b2dc0ecf938addbd779d42877b6ed69d9a985`，以 GCC 11.4.0 从源码编译并在
+  RUP-only 模式（`-U`）运行：六个分支全部报告 `s VERIFIED`，RAT 引理数均为 0；
+- 另一轮审计使用 Debian `drat-trim` 0.0~git20240428.effa1dc-2，同样全部通过。
 
 达到下界的实例的 13 个最大匹配数为：
 

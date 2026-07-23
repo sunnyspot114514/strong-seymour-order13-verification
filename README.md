@@ -50,6 +50,24 @@ sizes
 Thus vertices 0 and 5 are non-strong and the other eleven are strong.
 Explicit Hall-defect certificates are included for both failing vertices.
 
+## Independent complete enumeration
+
+A second proof route bypasses the SAT encoding entirely. It checks all
+1,495,297 non-isomorphic regular tournaments of order 13 from Brendan
+McKay's catalogue by direct Hall-subset enumeration and maximum matching.
+The two implementations agreed on all 19,438,861 vertex checks.
+
+The resulting unlabelled distribution is:
+
+| Strong vertices | Isomorphism classes |
+|---:|---:|
+| 11 | 13 |
+| 12 | 48 |
+| 13 | 1,495,236 |
+
+See [`enumeration/`](enumeration/) for source, pinned dataset provenance,
+complete results, logs, and one-command reproduction.
+
 ## Reproduce the exact extremal verification
 
 Requirements are Python 3, Bash, and a C++17 compiler exposed as `g++`.

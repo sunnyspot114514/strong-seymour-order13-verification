@@ -19,6 +19,18 @@
     "matching_sizes": [5, 6, 6, 6, 6, 5, 6, 6, 6, 6, 6, 6, 6],
     "adjacency_matrix_sha256": "8f7926e1544e8bc087fbce2595754b7a9c30719be7ced398368c053cf45c09fb"
   },
+  "complete_enumeration_crosscheck": {
+    "catalogue": "Brendan McKay rt13.txt.gz",
+    "catalogue_sha256": "df63dbf6d173094b7fc31866f928410bd6738403d06be9b407eb5e28970fd058",
+    "nonisomorphic_regular_tournaments": 1495297,
+    "vertex_checks": 19438861,
+    "hall_and_augmenting_path_agree_everywhere": true,
+    "strong_count_distribution_unlabelled": {
+      "11": 13,
+      "12": 48,
+      "13": 1495236
+    }
+  },
   "source_archive_sha256": "a4ca8b8d0ab5c262b0baf92eea32826d770a1892d40b4428d27756916414b7c8",
   "reproduction_environment": {
     "os": "Ubuntu 22.04.5 LTS under WSL2",

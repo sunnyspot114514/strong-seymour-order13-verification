@@ -4,6 +4,7 @@
 **/build/
 **/regenerated/
 **/milp_results/
+/enumeration/work/
 /.venv/
 /venv/
 __pycache__/

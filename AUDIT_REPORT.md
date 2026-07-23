@@ -30,6 +30,24 @@ The earlier existence-only SAT and MILP audit remains preserved below.
   witness has matching sizes
   `[5,6,6,6,6,5,6,6,6,6,6,6,6]`, hence exactly eleven strong vertices.
 
+## Independent complete-catalogue enumeration
+
+A separate computation downloaded Brendan McKay's complete catalogue of
+1,495,297 non-isomorphic regular tournaments of order 13 and checked every
+vertex directly, without using the SAT generator, CNFs, solver, or RUP
+proofs.
+
+For each of 19,438,861 vertex checks, exhaustive Hall-subset enumeration
+and a separately implemented augmenting-path maximum matching agreed. The
+minimum strong count was 11. Exactly 13 isomorphism classes attained 11,
+48 attained 12, and 1,495,236 attained 13.
+
+The catalogue SHA-256 was
+`df63dbf6d173094b7fc31866f928410bd6738403d06be9b407eb5e28970fd058`.
+The deterministic result reproduced byte-for-byte on a second full run.
+The first extremal catalogue witness was additionally verified by exhaustive
+partial injections in Python.
+
 ## Earlier existence-only audit
 
 The original solver and watched-literal checker were rebuilt from source.

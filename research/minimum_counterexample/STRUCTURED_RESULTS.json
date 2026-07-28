@@ -1,0 +1,63 @@
+{
+  "experiment": "positive-weight transitive blow-ups of nearby and sampled 10-vertex tournament templates",
+  "date": "2026-07-29",
+  "base_template_code": "110000101011101000010111101010010100010010010",
+  "weight_cap": 23,
+  "controls": {
+    "base_template_cap_23": "INFEASIBLE",
+    "base_template_cap_24": "FEASIBLE",
+    "base_template_cap_24_witness": [
+      5,
+      1,
+      2,
+      1,
+      4,
+      1,
+      2,
+      5,
+      1,
+      2
+    ]
+  },
+  "edge_flip_distance_results": [
+    {
+      "distance": 0,
+      "templates_tested": 1,
+      "feasible_at_cap": 0
+    },
+    {
+      "distance": 1,
+      "templates_tested": 45,
+      "feasible_at_cap": 0
+    },
+    {
+      "distance": 2,
+      "templates_tested": 990,
+      "feasible_at_cap": 0,
+      "worker_counts": [
+        248,
+        248,
+        247,
+        247
+      ]
+    },
+    {
+      "distance": 3,
+      "sampling": "first 2000 templates after deterministic shuffle",
+      "shuffle_seed": 20260729,
+      "templates_tested": 2000,
+      "feasible_at_cap": 0
+    }
+  ],
+  "random_template_sample": {
+    "random_seed": 20260729,
+    "unique_templates_tested": 1000,
+    "feasible_at_cap": 0
+  },
+  "scope": "The distance-zero, one, and two results are exhaustive in those neighbourhoods. The distance-three and random-template results are samples only. This is not a proof that no 23-vertex tournament counterexample exists.",
+  "solver": {
+    "interface": "scipy.optimize.milp",
+    "scipy_version": "1.17.1",
+    "backend": "HiGHS"
+  }
+}

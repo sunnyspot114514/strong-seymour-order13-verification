@@ -18,6 +18,12 @@ The counterexamples, direct Hall certificates, and independent audits are in
 14 <= n_oriented <= n_tournament <= 24.
 ```
 
+Active work on the minimum tournament counterexample—including exact
+23-vertex branches, near-counterexamples, and weighted-template searches—is
+in [`research/minimum_counterexample/`](research/minimum_counterexample/).
+The research status distinguishes completed solver results from timeouts and
+does not claim that order 24 is minimal.
+
 The order-13 exact result is:
 
 > **Every regular tournament on 13 vertices has at least eleven strong

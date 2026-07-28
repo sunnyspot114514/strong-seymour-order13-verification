@@ -6,6 +6,11 @@
 **/milp_results/
 /enumeration/work/
 /counterexamples/*/work/
+/research/minimum_counterexample/search_work/
+/research/minimum_counterexample/search_tournament.tmp
+/research/minimum_counterexample/*.log
+/research/minimum_counterexample/*.matrix
+/n23_*.kissat.out
 /.venv/
 /venv/
 __pycache__/

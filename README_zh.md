@@ -15,6 +15,10 @@
 14 <= n_oriented <= n_tournament <= 24.
 ```
 
+关于最小 tournament 反例的持续研究——包括 23 阶精确分支、近反例和加权模板搜索——位于
+[`research/minimum_counterexample/`](research/minimum_counterexample/)。
+研究状态会严格区分已完成的求解结果与超时分支，目前不声称 24 阶具有最小性。
+
 13 阶精确结论为：
 
 > **每个 13 阶正则 tournament 至少包含 11 个 strong Seymour 顶点，而且这个下界是紧的。**

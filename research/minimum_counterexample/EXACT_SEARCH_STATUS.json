@@ -1,0 +1,132 @@
+{
+  "date": "2026-07-29",
+  "target": "23-vertex tournament with no strong Seymour vertex",
+  "branching": {
+    "root": "a minimum-outdegree vertex relabelled as vertex 0",
+    "d_range": [
+      6,
+      11
+    ],
+    "p_definition": "number of out-neighbour vertices in a padded size-(d-1) cover for root 0"
+  },
+  "completed_unsat_branches": {
+    "6": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "7": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "8": [
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "9": [
+      7,
+      8
+    ]
+  },
+  "important_unknown_branches": [
+    {
+      "d": 7,
+      "p": 0
+    },
+    {
+      "d": 7,
+      "p": 1
+    },
+    {
+      "d": 8,
+      "p": 2
+    },
+    {
+      "d": 9,
+      "p": 6
+    }
+  ],
+  "unstarted_or_not_recorded_as_complete": {
+    "8": [
+      0,
+      1
+    ],
+    "9": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "10": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "11": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ]
+  },
+  "control_results": {
+    "order13_regular_branches": "UNSAT",
+    "fixed_order24_counterexample": "SAT and independently rechecked by exact matching and Hall-defect enumeration"
+  },
+  "solver_note": "Completed branches are solver results, not yet a certified lower-bound release: proof traces were not generated in this exploratory run. Time-limited branches are recorded only as UNKNOWN.",
+  "bounded_unknown_runs": {
+    "solvers": [
+      "Kissat 4.0.4",
+      "CaDiCaL 3.0.1",
+      "Glucose3",
+      "Glucose4",
+      "Minisat22",
+      "HiGHS MILP",
+      "OR-Tools CP-SAT 9.15.6755"
+    ],
+    "maximum_reported_cpsat_seconds_per_run": 180
+  },
+  "near_counterexamples": [
+    {
+      "path": "candidates/order23_min_degree6_one_strong.matrix",
+      "minimum_outdegree": 6,
+      "strong_vertices": [
+        6
+      ],
+      "sha256": "17e1af44a3a2c22c07b61c19a37787dd99239bd1de4209e712d5e0766cb36844"
+    },
+    {
+      "path": "candidates/order23_min_degree7_one_strong.matrix",
+      "minimum_outdegree": 7,
+      "strong_vertices": [
+        15
+      ],
+      "sha256": "73d498e2968a6ca98acadd3384b5846ee4e569699514a753bacbeff40cab871c"
+    }
+  ]
+}

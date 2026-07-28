@@ -1,14 +1,45 @@
-# 13 阶正则 tournament 中 strong Seymour 顶点数量的精确极值
+# Strong Seymour 精确验证与显式反例
 
 [US English](README.md) | [CN 中文说明](README_zh.md)
 
-本仓库给出以下精确有限结论的可复现计算机辅助验证：
+本仓库提供以下三个有限结论的可复现验证材料：
+
+1. 每个 13 阶正则 tournament 至少有 11 个 strong Seymour 顶点，且界是紧的；
+2. 存在一张 24 阶 tournament，没有任何 strong Seymour 顶点；
+3. 存在一个 36 阶六簇 oriented graph 反例，并可按比例扩展成无限族。
+
+反例、直接 Hall 证书和独立审计位于 [`counterexamples/`](counterexamples/)。
+当前阶数边界为：
+
+```text
+14 <= n_oriented <= n_tournament <= 24.
+```
+
+13 阶精确结论为：
 
 > **每个 13 阶正则 tournament 至少包含 11 个 strong Seymour 顶点，而且这个下界是紧的。**
 
 等价地说，非 strong Seymour 顶点最多有 2 个，并且仓库中给出了一张恰好达到 2 个的 tournament。
 
 强化实验、证书与紧致实例位于 [`extremal/`](extremal/)。
+
+## 显式反例
+
+24 阶构造把大小为
+
+```text
+(5,1,2,2,3,1,2,5,1,2)
+```
+
+的传递 tournament 代入一个十点 tournament 模板。传递补全引理为每个非
+末位簇内顶点给出单点 Hall 缺陷，十份类级加权 Hall 缺陷覆盖其余顶点。
+Python、C++、有限状态 DP 和 NetworkX 检查均得到 strong 顶点数为 0。
+
+早期 36 阶构造使用大小为 `(11,7,3,3,3,9)` 的六个独立簇。虽然 24 阶
+tournament 给出了更强上界，但这个六点模板及其显式无限反例族仍有独立的
+结构价值。
+
+这里不声称 24 或 36 是全局最小反例阶数。
 
 ## 证据摘要
 
@@ -90,3 +121,8 @@ bash run_milp_all.sh
 ## 结论边界
 
 这是尚未经过同行评审的有限计算机辅助结果。RUP 证书证明所发布 CNF 不可满足；图论结论还依赖于文档中的数学归约以及 CNF 生成器的正确性。
+显式反例不依赖 SAT 不可满足性，而是从小模板直接重建，并以 Hall 缺陷和最大
+匹配复核。
+
+Bai、Li、Park 当前的 arXiv v2 已记录 David Dzitsoev 提供的 36 阶反例。
+这里的 24 阶构造改进了显式 tournament 上界；本仓库不声称最早发现反例。

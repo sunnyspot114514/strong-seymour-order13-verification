@@ -1,0 +1,32 @@
+{
+  "statement": "The transitive substitution of the specified weighted 10-vertex tournament is a 24-vertex tournament with no strong Seymour vertex.",
+  "order": 24,
+  "template_code": "110000101011101000010111101010010100010010010",
+  "weights": [
+    5,
+    1,
+    2,
+    2,
+    3,
+    1,
+    2,
+    5,
+    1,
+    2
+  ],
+  "internal_orientation": "transitive",
+  "strong_vertices": 0,
+  "matrix_sha256": "d3b70f40dd3cc33f66ba23dcbb99138580d6cd6d6684e3658028606d680d23ed",
+  "counterexample_order_bounds": {
+    "oriented_graphs": {
+      "lower": 14,
+      "upper": 24
+    },
+    "tournaments": {
+      "lower": 14,
+      "upper": 24
+    },
+    "relation": "n_oriented <= n_tournament"
+  },
+  "minimality_status": "24 is an explicit upper bound, not proved globally minimal."
+}

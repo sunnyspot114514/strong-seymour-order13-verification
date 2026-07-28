@@ -1,0 +1,11 @@
+{
+  "statement": "The specified weighted six-cluster blow-up is a 36-vertex oriented graph with no strong Seymour vertex.",
+  "order": 36,
+  "cluster_weights": [11, 7, 3, 3, 3, 9],
+  "cluster_internal_graphs": "independent sets",
+  "arc_count": 509,
+  "minimum_outdegree": 13,
+  "strong_vertices": 0,
+  "matrix_sha256": "ce1ce6f2e86b7e4546477e1f821e2ccb155836c58ee27418252930fe4c585985",
+  "scope": "Direct construction only; no global or template-class minimality claim."
+}

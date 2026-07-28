@@ -5,6 +5,7 @@
 **/regenerated/
 **/milp_results/
 /enumeration/work/
+/counterexamples/*/work/
 /.venv/
 /venv/
 __pycache__/

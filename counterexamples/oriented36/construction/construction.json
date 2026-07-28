@@ -1,0 +1,22 @@
+{
+  "name": "six-cluster tournament blow-up counterexample",
+  "template_vertices": 6,
+  "cluster_weights": [11, 7, 3, 3, 3, 9],
+  "template_outneighbors": {
+    "0": [1, 2, 4],
+    "1": [3, 4, 5],
+    "2": [1, 5],
+    "3": [0, 2],
+    "4": [2, 3, 5],
+    "5": [0, 3]
+  },
+  "order": 36,
+  "class_hall_witnesses": [
+    {"root_class": 0, "S_classes": [1, 2, 4], "Gamma_classes": [3, 5], "S_weight": 13, "Gamma_weight": 12},
+    {"root_class": 1, "S_classes": [3, 4, 5], "Gamma_classes": [0, 2], "S_weight": 15, "Gamma_weight": 14},
+    {"root_class": 2, "S_classes": [1], "Gamma_classes": [3, 4], "S_weight": 7, "Gamma_weight": 6},
+    {"root_class": 3, "S_classes": [0], "Gamma_classes": [1, 4], "S_weight": 11, "Gamma_weight": 10},
+    {"root_class": 4, "S_classes": [3, 5], "Gamma_classes": [0], "S_weight": 12, "Gamma_weight": 11},
+    {"root_class": 5, "S_classes": [0, 3], "Gamma_classes": [1, 2, 4], "S_weight": 14, "Gamma_weight": 13}
+  ]
+}

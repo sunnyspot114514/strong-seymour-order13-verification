@@ -1,0 +1,513 @@
+{
+  "n": 24,
+  "template_code": "110000101011101000010111101010010100010010010",
+  "weights": [
+    5,
+    1,
+    2,
+    2,
+    3,
+    1,
+    2,
+    5,
+    1,
+    2
+  ],
+  "internal_orientation": "transitive within each class: V_i_r -> V_i_s iff r<s",
+  "labels": [
+    "V0_0",
+    "V0_1",
+    "V0_2",
+    "V0_3",
+    "V0_4",
+    "V1_0",
+    "V2_0",
+    "V2_1",
+    "V3_0",
+    "V3_1",
+    "V4_0",
+    "V4_1",
+    "V4_2",
+    "V5_0",
+    "V6_0",
+    "V6_1",
+    "V7_0",
+    "V7_1",
+    "V7_2",
+    "V7_3",
+    "V7_4",
+    "V8_0",
+    "V9_0",
+    "V9_1"
+  ],
+  "matrix_sha256": "d3b70f40dd3cc33f66ba23dcbb99138580d6cd6d6684e3658028606d680d23ed",
+  "rows": [
+    "011111110000000011111011",
+    "001111110000000011111011",
+    "000111110000000011111011",
+    "000011110000000011111011",
+    "000001110000000011111011",
+    "000000001111110011111000",
+    "000001010000010011111111",
+    "000001000000010011111111",
+    "111110110111101100000100",
+    "111110110011101100000100",
+    "111110110001101100000100",
+    "111110110000101100000100",
+    "111110110000001100000100",
+    "111110001111100000000100",
+    "111111110000010100000100",
+    "111111110000010000000100",
+    "000000001111111101111011",
+    "000000001111111100111011",
+    "000000001111111100011011",
+    "000000001111111100001011",
+    "000000001111111100000011",
+    "111111000000000011111000",
+    "000001001111111100000101",
+    "000001001111111100000100"
+  ],
+  "vertices": [
+    {
+      "vertex": "V0_0",
+      "index": 0,
+      "class": 0,
+      "position": 0,
+      "outdegree": 14,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V0_1"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V0_1",
+      "index": 1,
+      "class": 0,
+      "position": 1,
+      "outdegree": 13,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V0_2"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V0_2",
+      "index": 2,
+      "class": 0,
+      "position": 2,
+      "outdegree": 12,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V0_3"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V0_3",
+      "index": 3,
+      "class": 0,
+      "position": 3,
+      "outdegree": 11,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V0_4"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V0_4",
+      "index": 4,
+      "class": 0,
+      "position": 4,
+      "outdegree": 10,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V1_0",
+        "V2_0",
+        "V2_1",
+        "V7_0",
+        "V7_1",
+        "V7_2",
+        "V7_3",
+        "V7_4",
+        "V9_0",
+        "V9_1"
+      ],
+      "hall_Gamma": [
+        "V3_0",
+        "V3_1",
+        "V4_0",
+        "V4_1",
+        "V4_2",
+        "V5_0",
+        "V6_0",
+        "V6_1",
+        "V8_0"
+      ]
+    },
+    {
+      "vertex": "V1_0",
+      "index": 5,
+      "class": 1,
+      "position": 0,
+      "outdegree": 11,
+      "strict_second": 12,
+      "matching": 10,
+      "hall_S": [
+        "V7_0",
+        "V7_1",
+        "V7_2",
+        "V7_3",
+        "V7_4"
+      ],
+      "hall_Gamma": [
+        "V6_0",
+        "V6_1",
+        "V9_0",
+        "V9_1"
+      ]
+    },
+    {
+      "vertex": "V2_0",
+      "index": 6,
+      "class": 2,
+      "position": 0,
+      "outdegree": 11,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        "V2_1"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V2_1",
+      "index": 7,
+      "class": 2,
+      "position": 1,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        "V1_0",
+        "V7_0",
+        "V7_1",
+        "V7_2",
+        "V7_3",
+        "V7_4",
+        "V9_0",
+        "V9_1"
+      ],
+      "hall_Gamma": [
+        "V3_0",
+        "V3_1",
+        "V4_0",
+        "V4_1",
+        "V4_2",
+        "V6_0",
+        "V6_1"
+      ]
+    },
+    {
+      "vertex": "V3_0",
+      "index": 8,
+      "class": 3,
+      "position": 0,
+      "outdegree": 14,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V3_1"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V3_1",
+      "index": 9,
+      "class": 3,
+      "position": 1,
+      "outdegree": 13,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V4_0"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V4_0",
+      "index": 10,
+      "class": 4,
+      "position": 0,
+      "outdegree": 12,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V4_1"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V4_1",
+      "index": 11,
+      "class": 4,
+      "position": 1,
+      "outdegree": 11,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V4_2"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V4_2",
+      "index": 12,
+      "class": 4,
+      "position": 2,
+      "outdegree": 10,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V0_0",
+        "V0_1",
+        "V0_2",
+        "V0_3",
+        "V0_4",
+        "V2_0",
+        "V2_1",
+        "V6_0",
+        "V6_1",
+        "V8_0"
+      ],
+      "hall_Gamma": [
+        "V1_0",
+        "V5_0",
+        "V7_0",
+        "V7_1",
+        "V7_2",
+        "V7_3",
+        "V7_4",
+        "V9_0",
+        "V9_1"
+      ]
+    },
+    {
+      "vertex": "V5_0",
+      "index": 13,
+      "class": 5,
+      "position": 0,
+      "outdegree": 11,
+      "strict_second": 12,
+      "matching": 10,
+      "hall_S": [
+        "V3_0",
+        "V3_1",
+        "V4_0",
+        "V4_1",
+        "V4_2"
+      ],
+      "hall_Gamma": [
+        "V2_0",
+        "V2_1",
+        "V6_0",
+        "V6_1"
+      ]
+    },
+    {
+      "vertex": "V6_0",
+      "index": 14,
+      "class": 6,
+      "position": 0,
+      "outdegree": 11,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        "V6_1"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V6_1",
+      "index": 15,
+      "class": 6,
+      "position": 1,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        "V0_0",
+        "V0_1",
+        "V0_2",
+        "V0_3",
+        "V0_4",
+        "V2_0",
+        "V2_1",
+        "V8_0"
+      ],
+      "hall_Gamma": [
+        "V7_0",
+        "V7_1",
+        "V7_2",
+        "V7_3",
+        "V7_4",
+        "V9_0",
+        "V9_1"
+      ]
+    },
+    {
+      "vertex": "V7_0",
+      "index": 16,
+      "class": 7,
+      "position": 0,
+      "outdegree": 14,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V7_1"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V7_1",
+      "index": 17,
+      "class": 7,
+      "position": 1,
+      "outdegree": 13,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V7_2"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V7_2",
+      "index": 18,
+      "class": 7,
+      "position": 2,
+      "outdegree": 12,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V7_3"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V7_3",
+      "index": 19,
+      "class": 7,
+      "position": 3,
+      "outdegree": 11,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V7_4"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V7_4",
+      "index": 20,
+      "class": 7,
+      "position": 4,
+      "outdegree": 10,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        "V3_0",
+        "V3_1",
+        "V4_0",
+        "V4_1",
+        "V4_2",
+        "V5_0",
+        "V6_0",
+        "V6_1",
+        "V9_0",
+        "V9_1"
+      ],
+      "hall_Gamma": [
+        "V0_0",
+        "V0_1",
+        "V0_2",
+        "V0_3",
+        "V0_4",
+        "V1_0",
+        "V2_0",
+        "V2_1",
+        "V8_0"
+      ]
+    },
+    {
+      "vertex": "V8_0",
+      "index": 21,
+      "class": 8,
+      "position": 0,
+      "outdegree": 11,
+      "strict_second": 12,
+      "matching": 10,
+      "hall_S": [
+        "V0_0",
+        "V0_1",
+        "V0_2",
+        "V0_3",
+        "V0_4"
+      ],
+      "hall_Gamma": [
+        "V2_0",
+        "V2_1",
+        "V9_0",
+        "V9_1"
+      ]
+    },
+    {
+      "vertex": "V9_0",
+      "index": 22,
+      "class": 9,
+      "position": 0,
+      "outdegree": 11,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        "V9_1"
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": "V9_1",
+      "index": 23,
+      "class": 9,
+      "position": 1,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        "V3_0",
+        "V3_1",
+        "V4_0",
+        "V4_1",
+        "V4_2",
+        "V5_0",
+        "V6_0",
+        "V6_1"
+      ],
+      "hall_Gamma": [
+        "V0_0",
+        "V0_1",
+        "V0_2",
+        "V0_3",
+        "V0_4",
+        "V2_0",
+        "V2_1"
+      ]
+    }
+  ]
+}

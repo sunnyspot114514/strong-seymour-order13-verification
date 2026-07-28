@@ -1,0 +1,576 @@
+{
+  "verified": true,
+  "order": 24,
+  "is_tournament": true,
+  "matrix_matches_published_bytes": true,
+  "matrix_sha256": "d3b70f40dd3cc33f66ba23dcbb99138580d6cd6d6684e3658028606d680d23ed",
+  "strong_vertices": [],
+  "published_vertex_certificates_checked": 24,
+  "matching_method": "reachable-right-mask dynamic programming",
+  "networkx_version": "3.6.1",
+  "networkx_matching_agreement": true,
+  "vertices": [
+    {
+      "vertex": 0,
+      "class": 0,
+      "outdegree": 14,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 5,
+      "smallest_hall_S": [
+        1
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 1,
+      "class": 0,
+      "outdegree": 13,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 4,
+      "smallest_hall_S": [
+        2
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 2,
+      "class": 0,
+      "outdegree": 12,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 3,
+      "smallest_hall_S": [
+        3
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 3,
+      "class": 0,
+      "outdegree": 11,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 2,
+      "smallest_hall_S": [
+        4
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 4,
+      "class": 0,
+      "outdegree": 10,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 1,
+      "smallest_hall_S": [
+        5,
+        6,
+        7,
+        16,
+        17,
+        18,
+        19,
+        20,
+        22,
+        23
+      ],
+      "smallest_hall_Gamma": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        21
+      ]
+    },
+    {
+      "vertex": 5,
+      "class": 1,
+      "outdegree": 11,
+      "strict_second": 12,
+      "matching": 10,
+      "matching_deficit": 1,
+      "smallest_hall_S": [
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "smallest_hall_Gamma": [
+        14,
+        15,
+        22,
+        23
+      ]
+    },
+    {
+      "vertex": 6,
+      "class": 2,
+      "outdegree": 11,
+      "strict_second": 12,
+      "matching": 9,
+      "matching_deficit": 2,
+      "smallest_hall_S": [
+        7
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 7,
+      "class": 2,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "matching_deficit": 1,
+      "smallest_hall_S": [
+        5,
+        16,
+        17,
+        18,
+        19,
+        20,
+        22,
+        23
+      ],
+      "smallest_hall_Gamma": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "vertex": 8,
+      "class": 3,
+      "outdegree": 14,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 5,
+      "smallest_hall_S": [
+        9
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 9,
+      "class": 3,
+      "outdegree": 13,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 4,
+      "smallest_hall_S": [
+        10
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 10,
+      "class": 4,
+      "outdegree": 12,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 3,
+      "smallest_hall_S": [
+        11
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 11,
+      "class": 4,
+      "outdegree": 11,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 2,
+      "smallest_hall_S": [
+        12
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 12,
+      "class": 4,
+      "outdegree": 10,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 1,
+      "smallest_hall_S": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        14,
+        15,
+        21
+      ],
+      "smallest_hall_Gamma": [
+        5,
+        13,
+        16,
+        17,
+        18,
+        19,
+        20,
+        22,
+        23
+      ]
+    },
+    {
+      "vertex": 13,
+      "class": 5,
+      "outdegree": 11,
+      "strict_second": 12,
+      "matching": 10,
+      "matching_deficit": 1,
+      "smallest_hall_S": [
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "smallest_hall_Gamma": [
+        6,
+        7,
+        14,
+        15
+      ]
+    },
+    {
+      "vertex": 14,
+      "class": 6,
+      "outdegree": 11,
+      "strict_second": 12,
+      "matching": 9,
+      "matching_deficit": 2,
+      "smallest_hall_S": [
+        15
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 15,
+      "class": 6,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "matching_deficit": 1,
+      "smallest_hall_S": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        21
+      ],
+      "smallest_hall_Gamma": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        22,
+        23
+      ]
+    },
+    {
+      "vertex": 16,
+      "class": 7,
+      "outdegree": 14,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 5,
+      "smallest_hall_S": [
+        17
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 17,
+      "class": 7,
+      "outdegree": 13,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 4,
+      "smallest_hall_S": [
+        18
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 18,
+      "class": 7,
+      "outdegree": 12,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 3,
+      "smallest_hall_S": [
+        19
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 19,
+      "class": 7,
+      "outdegree": 11,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 2,
+      "smallest_hall_S": [
+        20
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 20,
+      "class": 7,
+      "outdegree": 10,
+      "strict_second": 9,
+      "matching": 9,
+      "matching_deficit": 1,
+      "smallest_hall_S": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        22,
+        23
+      ],
+      "smallest_hall_Gamma": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        21
+      ]
+    },
+    {
+      "vertex": 21,
+      "class": 8,
+      "outdegree": 11,
+      "strict_second": 12,
+      "matching": 10,
+      "matching_deficit": 1,
+      "smallest_hall_S": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "smallest_hall_Gamma": [
+        6,
+        7,
+        22,
+        23
+      ]
+    },
+    {
+      "vertex": 22,
+      "class": 9,
+      "outdegree": 11,
+      "strict_second": 12,
+      "matching": 9,
+      "matching_deficit": 2,
+      "smallest_hall_S": [
+        23
+      ],
+      "smallest_hall_Gamma": []
+    },
+    {
+      "vertex": 23,
+      "class": 9,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "matching_deficit": 1,
+      "smallest_hall_S": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "smallest_hall_Gamma": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        7
+      ]
+    }
+  ],
+  "structural_class_certificates": [
+    {
+      "root_class": 0,
+      "J": [
+        1,
+        2,
+        7,
+        9
+      ],
+      "weight_J": 10,
+      "Gamma": [
+        3,
+        4,
+        5,
+        6,
+        8
+      ],
+      "weight_Gamma": 9
+    },
+    {
+      "root_class": 1,
+      "J": [
+        7
+      ],
+      "weight_J": 5,
+      "Gamma": [
+        6,
+        9
+      ],
+      "weight_Gamma": 4
+    },
+    {
+      "root_class": 2,
+      "J": [
+        1,
+        7,
+        9
+      ],
+      "weight_J": 8,
+      "Gamma": [
+        3,
+        4,
+        6
+      ],
+      "weight_Gamma": 7
+    },
+    {
+      "root_class": 3,
+      "J": [
+        4
+      ],
+      "weight_J": 3,
+      "Gamma": [],
+      "weight_Gamma": 0
+    },
+    {
+      "root_class": 4,
+      "J": [
+        0,
+        2,
+        6,
+        8
+      ],
+      "weight_J": 10,
+      "Gamma": [
+        1,
+        5,
+        7,
+        9
+      ],
+      "weight_Gamma": 9
+    },
+    {
+      "root_class": 5,
+      "J": [
+        3,
+        4
+      ],
+      "weight_J": 5,
+      "Gamma": [
+        2,
+        6
+      ],
+      "weight_Gamma": 4
+    },
+    {
+      "root_class": 6,
+      "J": [
+        0,
+        2,
+        8
+      ],
+      "weight_J": 8,
+      "Gamma": [
+        7,
+        9
+      ],
+      "weight_Gamma": 7
+    },
+    {
+      "root_class": 7,
+      "J": [
+        3,
+        4,
+        5,
+        6,
+        9
+      ],
+      "weight_J": 10,
+      "Gamma": [
+        0,
+        1,
+        2,
+        8
+      ],
+      "weight_Gamma": 9
+    },
+    {
+      "root_class": 8,
+      "J": [
+        0
+      ],
+      "weight_J": 5,
+      "Gamma": [
+        2,
+        9
+      ],
+      "weight_Gamma": 4
+    },
+    {
+      "root_class": 9,
+      "J": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "weight_J": 8,
+      "Gamma": [
+        0,
+        2
+      ],
+      "weight_Gamma": 7
+    }
+  ]
+}

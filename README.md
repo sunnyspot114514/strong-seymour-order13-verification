@@ -1,9 +1,24 @@
-# Exact Strong Seymour Extremum at Order 13
+# Strong Seymour Verification and Explicit Counterexamples
 
 [US English](README.md) | [CN 中文说明](README_zh.md)
 
-This repository contains a reproducible computer-assisted verification of
-the following exact finite result:
+This repository contains reproducible verification artifacts for three
+finite results:
+
+1. every regular tournament of order 13 has at least eleven strong Seymour
+   vertices, and the bound is sharp;
+2. an explicit tournament of order 24 has no strong Seymour vertex;
+3. an explicit six-cluster oriented graph of order 36 has no strong Seymour
+   vertex and scales to an infinite family.
+
+The counterexamples, direct Hall certificates, and independent audits are in
+[`counterexamples/`](counterexamples/). The current order bounds are
+
+```text
+14 <= n_oriented <= n_tournament <= 24.
+```
+
+The order-13 exact result is:
 
 > **Every regular tournament on 13 vertices has at least eleven strong
 > Seymour vertices, and this bound is sharp.**
@@ -13,6 +28,26 @@ tournament attaining two is included.
 
 The strengthened experiment, certificates, and tight witness are in
 [`extremal/`](extremal/).
+
+## Explicit counterexamples
+
+The order-24 construction substitutes transitive tournaments of sizes
+
+```text
+(5,1,2,2,3,1,2,5,1,2)
+```
+
+into a ten-vertex tournament. A transitive-completion lemma gives singleton
+Hall defects for all non-last cluster vertices, while ten weighted
+class-level Hall defects cover the remaining vertices. Direct Python, C++,
+finite-state-DP, and NetworkX checks all find zero strong vertices.
+
+The earlier order-36 construction uses six independent clusters of sizes
+`(11,7,3,3,3,9)`. It remains useful as a particularly small template and an
+explicit infinite family, although the order-24 tournament gives the
+stronger upper bound.
+
+Neither construction is claimed to have minimum possible order.
 
 ## Evidence at a glance
 
@@ -120,4 +155,11 @@ eleven applies specifically to 13-vertex regular tournaments.
 This is a finite computer-assisted result and has not been peer reviewed.
 The RUP certificates establish unsatisfiability of the published CNFs. The
 graph-theoretic conclusion additionally relies on the documented reduction
-and the correctness of the CNF generator.
+and the correctness of the CNF generator. The explicit counterexamples do
+not depend on SAT unsatisfiability: they are reconstructed from small
+templates and verified directly by Hall defects and maximum matching.
+
+The current arXiv v2 of Bai, Li, and Park already records an order-36
+counterexample communicated by David Dzitsoev. The order-24 construction
+published here improves the explicit tournament upper bound; this repository
+does not claim priority for the first counterexample.

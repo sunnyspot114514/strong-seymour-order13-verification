@@ -1,0 +1,115 @@
+name: Order-20 RUP certificates
+
+on:
+  workflow_dispatch:
+    inputs:
+      branches:
+        description: JSON array of {degree,cover_left} branch objects
+        required: true
+        type: string
+        default: >-
+          [{"degree":6,"cover_left":0},{"degree":6,"cover_left":1},{"degree":6,"cover_left":2},{"degree":6,"cover_left":3},{"degree":6,"cover_left":4},{"degree":6,"cover_left":5},{"degree":7,"cover_left":0},{"degree":7,"cover_left":1},{"degree":7,"cover_left":2},{"degree":7,"cover_left":3},{"degree":7,"cover_left":4},{"degree":7,"cover_left":5},{"degree":7,"cover_left":6},{"degree":8,"cover_left":0},{"degree":8,"cover_left":1},{"degree":8,"cover_left":2},{"degree":8,"cover_left":3},{"degree":8,"cover_left":4},{"degree":8,"cover_left":5},{"degree":8,"cover_left":6},{"degree":8,"cover_left":7},{"degree":9,"cover_left":0},{"degree":9,"cover_left":1},{"degree":9,"cover_left":2},{"degree":9,"cover_left":3},{"degree":9,"cover_left":4},{"degree":9,"cover_left":5},{"degree":9,"cover_left":6},{"degree":9,"cover_left":7},{"degree":9,"cover_left":8}]
+
+permissions:
+  contents: read
+
+jobs:
+  certify:
+    name: d${{ matrix.degree }} p${{ matrix.cover_left }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.branches) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build pinned Gimsatul
+        run: |
+          git clone --quiet https://github.com/arminbiere/gimsatul.git tools/gimsatul
+          git -C tools/gimsatul checkout --quiet 4664fd74c97f87e30e7f907181707679b6fa49f2
+          cd tools/gimsatul
+          ./configure
+          make -j4
+
+      - name: Build pinned upstream drat-trim
+        run: |
+          git clone --quiet https://github.com/marijnheule/drat-trim.git tools/drat-trim
+          git -C tools/drat-trim checkout --quiet 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
+          gcc tools/drat-trim/drat-trim.c -O2 -std=c99 \
+            -o tools/drat-trim/drat-trim
+
+      - name: Generate branch CNF
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+        run: |
+          mkdir -p proof
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          python3 research/minimum_counterexample/generate_tournament_cnf.py \
+            20 "$DEGREE" "proof/${stem}.cnf" \
+            --encoding conditional-cover \
+            --root-cover-left "$COVER_LEFT" \
+            --symmetry hierarchical-profile-ties
+
+      - name: Produce an ASCII DRAT refutation
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+        run: |
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          set +e
+          /usr/bin/time -v tools/gimsatul/gimsatul --threads=4 -a \
+            "proof/${stem}.cnf" "proof/${stem}.drat" \
+            > "proof/${stem}.solver.log" 2>&1
+          status=$?
+          set -e
+          printf '%s\n' "$status" > "proof/${stem}.solver.exit"
+          test "$status" -eq 20
+
+      - name: Extract and independently verify a pure-RUP core
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+        run: |
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          tools/drat-trim/drat-trim \
+            "proof/${stem}.cnf" "proof/${stem}.drat" -U \
+            -l "proof/${stem}.core.rup" \
+            > "proof/${stem}.core-extraction.log" 2>&1
+          grep -q '^s VERIFIED' "proof/${stem}.core-extraction.log"
+          tools/drat-trim/drat-trim \
+            "proof/${stem}.cnf" "proof/${stem}.core.rup" -U \
+            > "proof/${stem}.core-verification.log" 2>&1
+          grep -q '^s VERIFIED' "proof/${stem}.core-verification.log"
+
+      - name: Compress and record provenance
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+        run: |
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          rm "proof/${stem}.drat"
+          xz -T4 -9 "proof/${stem}.core.rup"
+          git -C tools/gimsatul rev-parse HEAD \
+            > proof/GIMSATUL_COMMIT.txt
+          git -C tools/drat-trim rev-parse HEAD \
+            > proof/DRAT_TRIM_COMMIT.txt
+          gcc --version | head -n 1 > proof/GCC_VERSION.txt
+          sha256sum \
+            "proof/${stem}.cnf" \
+            "proof/${stem}.json" \
+            "proof/${stem}.core.rup.xz" \
+            tools/gimsatul/gimsatul \
+            tools/drat-trim/drat-trim \
+            > "proof/${stem}.SHA256SUMS.txt"
+
+      - name: Upload checked certificate
+        uses: actions/upload-artifact@v4
+        with:
+          name: order20-rup-d${{ matrix.degree }}-p${{ matrix.cover_left }}
+          path: proof/
+          retention-days: 30
+

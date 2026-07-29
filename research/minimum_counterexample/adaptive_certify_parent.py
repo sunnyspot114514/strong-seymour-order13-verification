@@ -97,6 +97,15 @@ def main() -> None:
         action="store_true",
         help="continue a verified round-limit partial tree in output",
     )
+    parser.add_argument(
+        "--fixed-variable-upper-bound",
+        type=int,
+        default=0,
+        help=(
+            "on split rounds, exhaustively assign unused variables up to "
+            "this bound instead of using CaDiCaL lookahead"
+        ),
+    )
     args = parser.parse_args()
 
     if args.output.exists() and not args.resume:
@@ -108,6 +117,7 @@ def main() -> None:
         or args.maximum_seconds < args.seconds
         or args.constant_rounds < 1
         or args.retries_before_split < 0
+        or args.fixed_variable_upper_bound < 0
         or args.jobs < 1
         or args.rounds < 1
         or not 0 <= args.xz_level <= 9
@@ -124,6 +134,7 @@ def main() -> None:
 
     script_dir = Path(__file__).resolve().parent
     refine_script = script_dir / "refine_cubes.py"
+    primary_refine_script = script_dir / "refine_cubes_primary.py"
     coverage_script = script_dir / "verify_cube_cover.py"
     certify_script = script_dir / "certify_cubes.py"
     select_script = script_dir / "select_failed_certificate_cubes.py"
@@ -245,20 +256,37 @@ def main() -> None:
                     ),
                 )
             )
-            run(
-                [
-                    sys.executable,
-                    str(refine_script),
-                    str(args.parent_cnf),
-                    str(round_parents),
-                    str(children),
-                    str(args.cube_generator),
-                    "--additional-depth",
-                    str(depth),
-                    "--jobs",
-                    str(args.jobs),
-                ]
-            )
+            if args.fixed_variable_upper_bound:
+                split_strategy = "fixed-primary"
+                run(
+                    [
+                        sys.executable,
+                        str(primary_refine_script),
+                        str(args.parent_cnf),
+                        str(round_parents),
+                        str(children),
+                        "--variable-upper-bound",
+                        str(args.fixed_variable_upper_bound),
+                        "--additional-depth",
+                        str(depth),
+                    ]
+                )
+            else:
+                split_strategy = "cadical-lookahead"
+                run(
+                    [
+                        sys.executable,
+                        str(refine_script),
+                        str(args.parent_cnf),
+                        str(round_parents),
+                        str(children),
+                        str(args.cube_generator),
+                        "--additional-depth",
+                        str(depth),
+                        "--jobs",
+                        str(args.jobs),
+                    ]
+                )
 
         coverage = round_dir / "coverage.json"
         run(
@@ -331,6 +359,9 @@ def main() -> None:
             "round": round_number,
             "mode": mode,
             "split_depth": depth,
+            "split_strategy": (
+                "none" if mode == "retry" else split_strategy
+            ),
             "parents": round_parents.name,
             "parents_sha256": sha256(round_parents),
             "children": children.name,
@@ -361,6 +392,9 @@ def main() -> None:
                 "maximum_seconds_per_command": args.maximum_seconds,
                 "constant_timeout_rounds": args.constant_rounds,
                 "retries_before_split": args.retries_before_split,
+                "fixed_variable_upper_bound": (
+                    args.fixed_variable_upper_bound
+                ),
                 "jobs": args.jobs,
                 "xz_level": args.xz_level,
                 "round_count": round_number,
@@ -398,6 +432,7 @@ def main() -> None:
         "maximum_seconds_per_command": args.maximum_seconds,
         "constant_timeout_rounds": args.constant_rounds,
         "retries_before_split": args.retries_before_split,
+        "fixed_variable_upper_bound": args.fixed_variable_upper_bound,
         "jobs": args.jobs,
         "xz_level": args.xz_level,
         "round_count": len(rounds),

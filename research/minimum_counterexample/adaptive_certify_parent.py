@@ -80,6 +80,15 @@ def main() -> None:
             "before exponential growth begins"
         ),
     )
+    parser.add_argument(
+        "--retries-before-split",
+        type=int,
+        default=0,
+        help=(
+            "after each split, retry unresolved cubes this many times with "
+            "doubling timeouts before splitting them again"
+        ),
+    )
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--rounds", type=int, default=8)
     parser.add_argument("--xz-level", type=int, default=1)
@@ -93,6 +102,7 @@ def main() -> None:
         or args.seconds < 1
         or args.maximum_seconds < args.seconds
         or args.constant_rounds < 1
+        or args.retries_before_split < 0
         or args.jobs < 1
         or args.rounds < 1
         or not 0 <= args.xz_level <= 9
@@ -119,6 +129,7 @@ def main() -> None:
     parents = root_parents
     rounds: list[dict[str, object]] = []
     total_refutations = 0
+    retries_since_split = 0
 
     for round_number in range(1, args.rounds + 1):
         round_dir = args.output / f"round_{round_number:02d}"
@@ -126,36 +137,57 @@ def main() -> None:
         round_parents = round_dir / "parents.cubes"
         round_parents.write_bytes(parents.read_bytes())
         children = round_dir / "children.cubes"
-        depth = (
-            args.initial_depth
-            if round_number == 1
-            else args.additional_depth
+        retry_mode = (
+            round_number > 1
+            and args.retries_before_split > 0
+            and retries_since_split < args.retries_before_split
         )
-        round_seconds = min(
-            args.maximum_seconds,
-            args.seconds
-            * (
-                2
-                ** max(
-                    0,
-                    round_number - args.constant_rounds,
+        if retry_mode:
+            mode = "retry"
+            depth = 0
+            retries_since_split += 1
+            round_seconds = min(
+                args.maximum_seconds,
+                args.seconds * (2**retries_since_split),
+            )
+            children.write_bytes(round_parents.read_bytes())
+        else:
+            mode = "split"
+            depth = (
+                args.initial_depth
+                if round_number == 1
+                else args.additional_depth
+            )
+            retries_since_split = 0
+            round_seconds = (
+                args.seconds
+                if args.retries_before_split > 0
+                else min(
+                    args.maximum_seconds,
+                    args.seconds
+                    * (
+                        2
+                        ** max(
+                            0,
+                            round_number - args.constant_rounds,
+                        )
+                    ),
                 )
-            ),
-        )
-        run(
-            [
-                sys.executable,
-                str(refine_script),
-                str(args.parent_cnf),
-                str(round_parents),
-                str(children),
-                str(args.cube_generator),
-                "--additional-depth",
-                str(depth),
-                "--jobs",
-                str(args.jobs),
-            ]
-        )
+            )
+            run(
+                [
+                    sys.executable,
+                    str(refine_script),
+                    str(args.parent_cnf),
+                    str(round_parents),
+                    str(children),
+                    str(args.cube_generator),
+                    "--additional-depth",
+                    str(depth),
+                    "--jobs",
+                    str(args.jobs),
+                ]
+            )
 
         coverage = round_dir / "coverage.json"
         run(
@@ -226,6 +258,8 @@ def main() -> None:
         total_refutations += len(records)
         round_record = {
             "round": round_number,
+            "mode": mode,
+            "split_depth": depth,
             "parents": round_parents.name,
             "parents_sha256": sha256(round_parents),
             "children": children.name,
@@ -255,6 +289,7 @@ def main() -> None:
                 "initial_seconds_per_command": args.seconds,
                 "maximum_seconds_per_command": args.maximum_seconds,
                 "constant_timeout_rounds": args.constant_rounds,
+                "retries_before_split": args.retries_before_split,
                 "jobs": args.jobs,
                 "xz_level": args.xz_level,
                 "round_count": round_number,

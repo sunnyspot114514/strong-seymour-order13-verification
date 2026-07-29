@@ -242,7 +242,7 @@ def main() -> None:
             )
         else:
             if args.solver_kind == "kissat":
-                solver_command.extend(["--unsat", "--quiet"])
+                solver_command.append("--unsat")
             elif args.solver_kind == "cadical":
                 solver_command.append("--quiet")
             solver_command.append(str(cube_cnf))
@@ -303,6 +303,8 @@ def main() -> None:
     if not args.keep_cnf:
         template.unlink()
     print(json.dumps(summary["counts"], sort_keys=True))
+    if summary["counts"]["ERROR"]:
+        raise SystemExit(2)
 
 
 if __name__ == "__main__":

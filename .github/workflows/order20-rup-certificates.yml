@@ -54,14 +54,14 @@ jobs:
             --root-cover-left "$COVER_LEFT" \
             --symmetry hierarchical-profile-ties
 
-      - name: Produce an ASCII DRAT refutation
+      - name: Produce a binary DRAT refutation
         env:
           DEGREE: ${{ matrix.degree }}
           COVER_LEFT: ${{ matrix.cover_left }}
         run: |
           stem="n20_d${DEGREE}p${COVER_LEFT}"
           set +e
-          /usr/bin/time -v tools/gimsatul/gimsatul --threads=4 -a \
+          /usr/bin/time -v tools/gimsatul/gimsatul --threads=4 \
             "proof/${stem}.cnf" "proof/${stem}.drat" \
             > "proof/${stem}.solver.log" 2>&1
           status=$?

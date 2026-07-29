@@ -87,7 +87,7 @@ jobs:
         if: ${{ matrix.resume_run_id }}
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.resume_artifact }}
+          name: order20-adaptive-rup-d${{ matrix.degree }}-p${{ matrix.cover_left }}-c${{ matrix.parent_index }}
           path: resume-artifact
           run-id: ${{ matrix.resume_run_id }}
           github-token: ${{ github.token }}

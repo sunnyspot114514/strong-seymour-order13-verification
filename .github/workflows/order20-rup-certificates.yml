@@ -75,14 +75,24 @@ jobs:
           COVER_LEFT: ${{ matrix.cover_left }}
         run: |
           stem="n20_d${DEGREE}p${COVER_LEFT}"
+          set +e
           tools/drat-trim/drat-trim \
             "proof/${stem}.cnf" "proof/${stem}.drat" -U \
             -l "proof/${stem}.core.rup" \
             > "proof/${stem}.core-extraction.log" 2>&1
+          extraction_status=$?
+          set -e
+          cat "proof/${stem}.core-extraction.log"
+          test "$extraction_status" -eq 0
           grep -q '^s VERIFIED' "proof/${stem}.core-extraction.log"
+          set +e
           tools/drat-trim/drat-trim \
             "proof/${stem}.cnf" "proof/${stem}.core.rup" -U \
             > "proof/${stem}.core-verification.log" 2>&1
+          verification_status=$?
+          set -e
+          cat "proof/${stem}.core-verification.log"
+          test "$verification_status" -eq 0
           grep -q '^s VERIFIED' "proof/${stem}.core-verification.log"
 
       - name: Compress and record provenance
@@ -107,9 +117,15 @@ jobs:
             > "proof/${stem}.SHA256SUMS.txt"
 
       - name: Upload checked certificate
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: order20-rup-d${{ matrix.degree }}-p${{ matrix.cover_left }}
-          path: proof/
+          path: |
+            proof/*.cnf
+            proof/*.json
+            proof/*.xz
+            proof/*.log
+            proof/*.txt
+            proof/*.exit
           retention-days: 30
-

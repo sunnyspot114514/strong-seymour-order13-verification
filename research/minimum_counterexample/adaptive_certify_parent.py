@@ -92,9 +92,14 @@ def main() -> None:
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--rounds", type=int, default=8)
     parser.add_argument("--xz-level", type=int, default=1)
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="continue a verified round-limit partial tree in output",
+    )
     args = parser.parse_args()
 
-    if args.output.exists():
+    if args.output.exists() and not args.resume:
         raise ValueError(f"refusing existing output: {args.output}")
     if (
         args.initial_depth < 1
@@ -123,15 +128,81 @@ def main() -> None:
     certify_script = script_dir / "certify_cubes.py"
     select_script = script_dir / "select_failed_certificate_cubes.py"
 
-    args.output.mkdir(parents=True)
-    root_parents = args.output / "root.cubes"
-    root_parents.write_text("a 0\n", encoding="ascii", newline="\n")
-    parents = root_parents
-    rounds: list[dict[str, object]] = []
-    total_refutations = 0
-    retries_since_split = 0
+    if args.resume:
+        partial_path = args.output / "adaptive_manifest.json"
+        if not partial_path.is_file():
+            raise FileNotFoundError(
+                f"missing partial adaptive manifest: {partial_path}"
+            )
+        partial = json.loads(partial_path.read_text(encoding="utf-8"))
+        rounds = partial.get("rounds")
+        if (
+            partial.get("verified") is not False
+            or partial.get("reason") != "round limit reached"
+            or partial.get("parent_cnf_sha256") != sha256(args.parent_cnf)
+            or not isinstance(rounds, list)
+            or not rounds
+        ):
+            raise ValueError(f"cannot resume {partial_path}")
+        for expected_round, record in enumerate(rounds, start=1):
+            if (
+                int(record["round"]) != expected_round
+                or record.get("mode") not in {"split", "retry"}
+            ):
+                raise ValueError(
+                    f"invalid prior round metadata in {partial_path}"
+                )
+        last_record = rounds[-1]
+        if int(last_record["failed_count"]) < 1:
+            raise ValueError(
+                f"partial tree has no unresolved cubes: {partial_path}"
+            )
+        last_round = args.output / f"round_{len(rounds):02d}"
+        parents = last_round / "failed.cubes"
+        if (
+            not parents.is_file()
+            or len(read_cubes(parents))
+            != int(last_record["failed_count"])
+        ):
+            raise ValueError(
+                f"invalid unresolved frontier for {partial_path}"
+            )
+        total_refutations = sum(
+            int(record["verified_count"]) for record in rounds
+        )
+        retries_since_split = 0
+        for record in reversed(rounds):
+            if record["mode"] != "retry":
+                break
+            retries_since_split += 1
+        if retries_since_split > args.retries_before_split:
+            raise ValueError(
+                "prior retry state exceeds --retries-before-split"
+            )
+        start_round = len(rounds) + 1
+        print(
+            json.dumps(
+                {
+                    "resuming": True,
+                    "next_round": start_round,
+                    "unresolved_cubes": len(read_cubes(parents)),
+                    "retained_refutations": total_refutations,
+                },
+                separators=(",", ":"),
+            ),
+            flush=True,
+        )
+    else:
+        args.output.mkdir(parents=True)
+        root_parents = args.output / "root.cubes"
+        root_parents.write_text("a 0\n", encoding="ascii", newline="\n")
+        parents = root_parents
+        rounds: list[dict[str, object]] = []
+        total_refutations = 0
+        retries_since_split = 0
+        start_round = 1
 
-    for round_number in range(1, args.rounds + 1):
+    for round_number in range(start_round, args.rounds + 1):
         round_dir = args.output / f"round_{round_number:02d}"
         round_dir.mkdir()
         round_parents = round_dir / "parents.cubes"
@@ -319,7 +390,18 @@ def main() -> None:
     partial = {
         "verified": False,
         "reason": "round limit reached",
+        "parent_cnf": args.parent_cnf.name,
         "parent_cnf_sha256": sha256(args.parent_cnf),
+        "initial_depth": args.initial_depth,
+        "additional_depth": args.additional_depth,
+        "initial_seconds_per_command": args.seconds,
+        "maximum_seconds_per_command": args.maximum_seconds,
+        "constant_timeout_rounds": args.constant_rounds,
+        "retries_before_split": args.retries_before_split,
+        "jobs": args.jobs,
+        "xz_level": args.xz_level,
+        "round_count": len(rounds),
+        "terminal_refutations": total_refutations,
         "rounds": rounds,
     }
     (args.output / "adaptive_manifest.json").write_text(

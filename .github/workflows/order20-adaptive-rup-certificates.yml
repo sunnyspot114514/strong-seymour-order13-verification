@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   certify:
@@ -82,14 +83,34 @@ jobs:
             "${prefix}.cnf" "${prefix}.unused.cubes" \
             "${prefix}.parent.json" --depth 1
 
+      - name: Download prior partial certificate
+        if: ${{ matrix.resume_run_id }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.resume_artifact }}
+          path: resume-artifact
+          run-id: ${{ matrix.resume_run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Restore prior partial certificate
+        if: ${{ matrix.resume_run_id }}
+        run: |
+          test -f resume-artifact/certificate/adaptive/adaptive_manifest.json
+          cp -a resume-artifact/certificate/adaptive certificate/adaptive
+
       - name: Produce and check the adaptive certificate tree
         env:
           DEGREE: ${{ matrix.degree }}
           COVER_LEFT: ${{ matrix.cover_left }}
           PARENT_INDEX: ${{ matrix.parent_index }}
+          RESUME_RUN_ID: ${{ matrix.resume_run_id }}
         run: |
           stem="n20_d${DEGREE}p${COVER_LEFT}"
           parent="work/${stem}.cube_${PARENT_INDEX}.cnf"
+          resume_args=()
+          if [[ -n "$RESUME_RUN_ID" ]]; then
+            resume_args+=(--resume)
+          fi
           python3 research/minimum_counterexample/adaptive_certify_parent.py \
             "$parent" certificate/adaptive \
             tools/generate-cadical-cubes \
@@ -103,7 +124,8 @@ jobs:
               "${{ matrix.retries_before_split || 0 }}" \
             --jobs "${{ matrix.jobs || 4 }}" \
             --rounds "${{ matrix.rounds || 8 }}" \
-            --xz-level "${{ matrix.xz_level || 1 }}"
+            --xz-level "${{ matrix.xz_level || 1 }}" \
+            "${resume_args[@]}"
 
       - name: Record provenance
         if: always()

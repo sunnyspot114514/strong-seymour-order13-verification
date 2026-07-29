@@ -1,0 +1,110 @@
+name: Order-22 d9p0 row tails
+
+on:
+  workflow_dispatch:
+    inputs:
+      solver_seconds:
+        description: Per-row Gimsatul time limit
+        required: true
+        type: number
+        default: 7200
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-22.04
+    outputs:
+      indices: ${{ steps.matrix.outputs.indices }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: matrix
+        name: Build the exact row-index matrix
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+
+          path = Path(
+              "research/minimum_counterexample/order22/"
+              "d9p0_gimsatul60_unknown.cubes"
+          )
+          count = sum(
+              line.startswith("a ")
+              for line in path.read_text(encoding="ascii").splitlines()
+          )
+          if count != 81:
+              raise SystemExit(f"expected 81 cubes, found {count}")
+          print("indices=" + json.dumps(list(range(count))))
+          PY
+
+  solve-row:
+    needs: prepare
+    name: row ${{ matrix.row_index }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        row_index: ${{ fromJSON(needs.prepare.outputs.indices) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build pinned Gimsatul
+        run: |
+          git clone --quiet https://github.com/arminbiere/gimsatul.git tools/gimsatul
+          git -C tools/gimsatul checkout --quiet 4664fd74c97f87e30e7f907181707679b6fa49f2
+          cd tools/gimsatul
+          ./configure
+          make -j4
+
+      - name: Generate the branch and select one exact row
+        env:
+          ROW_INDEX: ${{ matrix.row_index }}
+        run: |
+          mkdir -p work
+          python3 research/minimum_counterexample/generate_tournament_cnf.py \
+            22 9 work/branch.cnf \
+            --encoding conditional-cover \
+            --root-cover-left 0 \
+            --symmetry hierarchical-profile-ties
+          sed -n "$((ROW_INDEX + 1))p" \
+            research/minimum_counterexample/order22/d9p0_gimsatul60_unknown.cubes \
+            > work/leaf.cubes
+          test "$(grep -c '^a ' work/leaf.cubes)" -eq 1
+          test "$(
+            sha256sum work/branch.cnf | cut -d' ' -f1
+          )" = "60242ec9fd3c6ca3ef9fef4eb7da4c5ab8d8225edcfba7e08bea25b6e17037d9"
+
+      - name: Solve the selected row
+        env:
+          SOLVER_LIMIT: ${{ inputs.solver_seconds }}
+        run: |
+          python3 research/minimum_counterexample/solve_cubes.py \
+            work/branch.cnf work/leaf.cubes \
+            work/solve tools/gimsatul/gimsatul \
+            --seconds "$SOLVER_LIMIT" --jobs 1 \
+            --solver-kind gimsatul --solver-threads 4 --allow-partial
+
+      - name: Record source and tool hashes
+        run: |
+          sha256sum \
+            work/branch.cnf \
+            work/branch.json \
+            work/leaf.cubes \
+            tools/gimsatul/gimsatul \
+            > work/SHA256SUMS.txt
+          git -C tools/gimsatul rev-parse HEAD > work/GIMSATUL_COMMIT.txt
+
+      - name: Upload deterministic search summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: order22-d9p0-row-${{ matrix.row_index }}
+          path: |
+            work/*.json
+            work/*.cubes
+            work/*.txt
+            work/solve/cube_sweep.json
+          retention-days: 14

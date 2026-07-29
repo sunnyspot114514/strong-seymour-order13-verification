@@ -176,6 +176,9 @@ Tournament read_matrix(const std::string& path) {
   std::vector<std::string> rows;
   std::string line;
   while (std::getline(input, line)) {
+    if (!line.empty() && line.back() == '\r') {
+      line.pop_back();
+    }
     if (!line.empty()) {
       rows.push_back(line);
     }
@@ -315,9 +318,10 @@ bool exhaustive_repair(Tournament& tournament, int radius) {
 }  // namespace
 
 int main(int argc, char** argv) {
-  if (argc < 2 || argc > 8) {
+  if (argc < 2 || argc > 10) {
     std::cerr << "usage: search_tournament MATRIX [RESTARTS] [ITERATIONS] "
-                 "[SEED] [PERTURB] [REPAIR_RADIUS] [MIN_OUTDEGREE]\n";
+                 "[SEED] [PERTURB] [REPAIR_RADIUS] [MIN_OUTDEGREE] "
+                 "[BEST_MATRIX] [KEEP_ORDER]\n";
     return 2;
   }
   const Tournament source = read_matrix(argv[1]);
@@ -333,6 +337,8 @@ int main(int argc, char** argv) {
   const int perturb = argc >= 6 ? std::stoi(argv[5]) : 12;
   const int repair_radius = argc >= 7 ? std::stoi(argv[6]) : 2;
   required_minimum_outdegree = argc >= 8 ? std::stoi(argv[7]) : 6;
+  const std::string best_matrix_path = argc >= 9 ? argv[8] : "";
+  const bool keep_order = argc >= 10 ? std::stoi(argv[9]) != 0 : false;
   std::mt19937_64 random(seed);
   std::uniform_real_distribution<double> unit(0.0, 1.0);
 
@@ -342,7 +348,8 @@ int main(int argc, char** argv) {
 
   for (int restart = 0; restart < restarts; ++restart) {
     const int deleted = restart % source.n;
-    Tournament current = delete_vertex(source, deleted);
+    Tournament current =
+        keep_order ? source : delete_vertex(source, deleted);
     std::uniform_int_distribution<int> vertex(0, current.n - 1);
     for (int step = 0; step < perturb; ++step) {
       int u = vertex(random);
@@ -361,6 +368,14 @@ int main(int argc, char** argv) {
         global_best = current;
         global_evaluation = current_evaluation;
         report_best(global_best, global_evaluation, restart, iteration);
+        if (!best_matrix_path.empty()) {
+          std::ofstream best_output(best_matrix_path);
+          if (!best_output) {
+            throw std::runtime_error("cannot write best matrix: " +
+                                     best_matrix_path);
+          }
+          best_output << matrix_text(global_best);
+        }
         if (global_evaluation.strong == 0 &&
             global_evaluation.degree_penalty == 0) {
           return 0;

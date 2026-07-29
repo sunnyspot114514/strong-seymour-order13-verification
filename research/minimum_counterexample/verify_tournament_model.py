@@ -20,14 +20,21 @@ def read_model(path: Path) -> set[int]:
         if fields[0] == "v":
             saw_model_line = True
             fields = fields[1:]
-        elif fields[0] in {"c", "s"}:
+        elif fields[0] == "s" or fields[0].startswith("c"):
             continue
         elif saw_model_line:
             continue
+        else:
+            try:
+                int(fields[0])
+            except ValueError:
+                continue
         for token in fields:
             literal = int(token)
             if literal > 0:
                 values.add(literal)
+    if not saw_model_line and not values:
+        raise ValueError("solver output contains no model literals")
     return values
 
 
@@ -50,6 +57,7 @@ def main() -> None:
     parser.add_argument("metadata", type=Path)
     parser.add_argument("model", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--matrix-output", type=Path)
     args = parser.parse_args()
     metadata = json.loads(args.metadata.read_text(encoding="utf-8"))
     true_variables = read_model(args.model)
@@ -135,6 +143,10 @@ def main() -> None:
     if strong_vertices:
         raise SystemExit(
             f"model is not a counterexample; strong vertices={strong_vertices}"
+        )
+    if args.matrix_output is not None:
+        args.matrix_output.write_text(
+            matrix, encoding="ascii", newline="\n"
         )
     args.output.write_text(
         json.dumps(result, indent=2) + "\n", encoding="utf-8"

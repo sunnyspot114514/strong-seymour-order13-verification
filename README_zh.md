@@ -5,7 +5,7 @@
 本仓库提供以下四个有限结论的可复现验证材料：
 
 1. 每个 13 阶正则 tournament 至少有 11 个 strong Seymour 顶点，且界是紧的；
-2. 存在一张 23 阶 tournament，没有任何 strong Seymour 顶点；
+2. 存在一张 21 阶 tournament，没有任何 strong Seymour 顶点；
 3. 存在一张具有清晰结构的 24 阶 tournament 反例；
 4. 存在一个 36 阶六簇 oriented graph 反例，并可按比例扩展成无限族。
 
@@ -13,12 +13,12 @@
 当前阶数边界为：
 
 ```text
-14 <= n_oriented <= n_tournament <= 23.
+14 <= n_oriented <= n_tournament <= 21.
 ```
 
-关于最小 tournament 反例的持续研究——包括 14 至 22 阶精确搜索和加权模板搜索——位于
+关于最小 tournament 反例的持续研究——包括 20 阶精确搜索和加权模板搜索——位于
 [`research/minimum_counterexample/`](research/minimum_counterexample/)。
-研究状态会严格区分已完成的求解结果与超时分支，目前不声称 23 阶具有最小性。
+研究状态会严格区分已完成的求解结果与超时分支，目前不声称 21 阶具有最小性。
 
 13 阶精确结论为：
 
@@ -30,9 +30,11 @@
 
 ## 显式反例
 
-23 阶反例由精确 SAT 编码找到，随后通过有限状态匹配 DP、独立 C++ 增广路
-实现和完整 Hall 子集穷举复核。其独立复现包位于
-[`counterexamples/tournament23/`](counterexamples/tournament23/)。
+21 阶反例来自一张精确 SAT 搜索得到的 22 阶模型：删去其中的 universal
+source 后，剩余 tournament 仍然没有任何 strong 顶点。随后又通过有限状态
+匹配 DP、独立 C++ 增广路实现和完整 Hall 子集穷举复核。其独立复现包位于
+[`counterexamples/tournament21/`](counterexamples/tournament21/)；早期 23 阶
+见证仍归档于 [`counterexamples/tournament23/`](counterexamples/tournament23/)。
 
 24 阶构造把大小为
 
@@ -47,7 +49,7 @@ Python、C++、有限状态 DP 和 NetworkX 检查均得到 strong 顶点数为 
 早期 36 阶构造使用大小为 `(11,7,3,3,3,9)` 的六个独立簇。这个六点模板
 及其显式无限反例族仍有独立的结构价值。
 
-这里不声称 23、24 或 36 是全局最小反例阶数。
+这里暂不声称 21、24 或 36 是全局最小反例阶数。
 
 ## 证据摘要
 

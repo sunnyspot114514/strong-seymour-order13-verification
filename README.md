@@ -7,7 +7,7 @@ finite results:
 
 1. every regular tournament of order 13 has at least eleven strong Seymour
    vertices, and the bound is sharp;
-2. an explicit tournament of order 23 has no strong Seymour vertex;
+2. an explicit tournament of order 21 has no strong Seymour vertex;
 3. a structured tournament construction of order 24 has no strong Seymour
    vertex;
 4. an explicit six-cluster oriented graph of order 36 has no strong Seymour
@@ -17,14 +17,14 @@ The counterexamples, direct Hall certificates, and independent audits are in
 [`counterexamples/`](counterexamples/). The current order bounds are
 
 ```text
-14 <= n_oriented <= n_tournament <= 23.
+14 <= n_oriented <= n_tournament <= 21.
 ```
 
-Active work on the minimum tournament counterexample—including exact
-searches at orders 14–22 and weighted-template searches—is
+Active work on the minimum tournament counterexample, including the exact
+order-20 search and weighted-template searches, is
 in [`research/minimum_counterexample/`](research/minimum_counterexample/).
 The research status distinguishes completed solver results from timeouts and
-does not claim that order 23 is minimal.
+does not claim that order 21 is minimal.
 
 The order-13 exact result is:
 
@@ -39,10 +39,13 @@ The strengthened experiment, certificates, and tight witness are in
 
 ## Explicit counterexamples
 
-The order-23 counterexample was found by the exact SAT encoding and then
-verified independently by finite-state matching DP, a C++ augmenting-path
-implementation, and complete Hall-subset enumeration. Its standalone package
-is in [`counterexamples/tournament23/`](counterexamples/tournament23/).
+The order-21 counterexample was extracted from an exact order-22 SAT model by
+deleting its universal source. It was then verified independently by
+finite-state matching DP, a C++ augmenting-path implementation, and complete
+Hall-subset enumeration. Its standalone package is in
+[`counterexamples/tournament21/`](counterexamples/tournament21/). The earlier
+order-23 witness remains archived in
+[`counterexamples/tournament23/`](counterexamples/tournament23/).
 
 The order-24 construction substitutes transitive tournaments of sizes
 
@@ -59,7 +62,8 @@ The earlier order-36 construction uses six independent clusters of sizes
 `(11,7,3,3,3,9)`. It remains useful as a particularly small template and an
 explicit infinite family.
 
-None of the constructions is claimed to have minimum possible order.
+None of the constructions is currently claimed to have minimum possible
+order.
 
 ## Evidence at a glance
 
@@ -173,5 +177,5 @@ templates and verified directly by Hall defects and maximum matching.
 
 The current arXiv v2 of Bai, Li, and Park already records an order-36
 counterexample communicated by David Dzitsoev. This repository now improves
-its explicit tournament upper bound to 23, but does not claim priority for
+its explicit tournament upper bound to 21, but does not claim priority for
 the first counterexample.

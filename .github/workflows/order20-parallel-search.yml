@@ -1,0 +1,147 @@
+name: Order-20 complete parallel search
+
+on:
+  workflow_dispatch:
+    inputs:
+      branches:
+        description: JSON array of {degree,cover_left} branch objects
+        required: true
+        type: string
+        default: >-
+          [{"degree":6,"cover_left":0},{"degree":6,"cover_left":1},{"degree":6,"cover_left":2},{"degree":6,"cover_left":3},{"degree":6,"cover_left":4},{"degree":6,"cover_left":5},{"degree":7,"cover_left":0},{"degree":7,"cover_left":1},{"degree":7,"cover_left":2},{"degree":7,"cover_left":3},{"degree":7,"cover_left":4},{"degree":7,"cover_left":5},{"degree":7,"cover_left":6},{"degree":8,"cover_left":0},{"degree":8,"cover_left":1},{"degree":8,"cover_left":2},{"degree":8,"cover_left":3},{"degree":8,"cover_left":4},{"degree":8,"cover_left":5},{"degree":8,"cover_left":6},{"degree":8,"cover_left":7},{"degree":9,"cover_left":0},{"degree":9,"cover_left":1},{"degree":9,"cover_left":2},{"degree":9,"cover_left":3},{"degree":9,"cover_left":4},{"degree":9,"cover_left":5},{"degree":9,"cover_left":6},{"degree":9,"cover_left":7},{"degree":9,"cover_left":8}]
+      long_tail_limit:
+        description: Run 1200-second four-thread leaves up to this count
+        required: true
+        type: number
+        default: 10
+
+permissions:
+  contents: read
+
+jobs:
+  search:
+    name: d${{ matrix.degree }} p${{ matrix.cover_left }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.branches) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build pinned Kissat
+        run: |
+          git clone --quiet https://github.com/arminbiere/kissat.git tools/kissat
+          git -C tools/kissat checkout --quiet 8af8e56f174b778aef3aa45af9f739b2a5f492c2
+          cd tools/kissat
+          ./configure --quiet
+          make -C build -j4
+
+      - name: Build pinned Gimsatul
+        run: |
+          git clone --quiet https://github.com/arminbiere/gimsatul.git tools/gimsatul
+          git -C tools/gimsatul checkout --quiet 4664fd74c97f87e30e7f907181707679b6fa49f2
+          cd tools/gimsatul
+          ./configure
+          make -j4
+
+      - name: Generate the complete branch and row partition
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+        run: |
+          mkdir -p work
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          python3 research/minimum_counterexample/generate_tournament_cnf.py \
+            20 "$DEGREE" "work/${stem}.cnf" \
+            --encoding conditional-cover \
+            --root-cover-left "$COVER_LEFT" \
+            --symmetry hierarchical-profile-ties
+          python3 research/minimum_counterexample/make_branch_row_cubes.py \
+            "work/${stem}.json" "work/${stem}.row.cubes"
+
+      - name: Solve all row cases with Kissat
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+        run: |
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          python3 research/minimum_counterexample/solve_cubes.py \
+            "work/${stem}.cnf" "work/${stem}.row.cubes" \
+            "work/${stem}.kissat15" tools/kissat/build/kissat \
+            --seconds 15 --jobs 4
+          python3 research/minimum_counterexample/extract_unknown_cubes.py \
+            "work/${stem}.kissat15/cube_sweep.json" \
+            "work/${stem}.unknown.cubes"
+
+      - name: Run four independent Gimsatul workers on unresolved rows
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+        run: |
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          if grep -q '^a ' "work/${stem}.unknown.cubes"; then
+            python3 research/minimum_counterexample/solve_cubes.py \
+              "work/${stem}.cnf" "work/${stem}.unknown.cubes" \
+              "work/${stem}.gimsatul120" tools/gimsatul/gimsatul \
+              --seconds 120 --jobs 4 --solver-kind gimsatul \
+              --solver-threads 1 --allow-partial
+          else
+            printf '%s\n' \
+              '{"counts":{"SAT":0,"UNSAT":0,"UNKNOWN":0,"ERROR":0}}' \
+              > "work/${stem}.gimsatul120.json"
+          fi
+
+      - name: Extend small unresolved tails with four-thread Gimsatul
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+          LONG_TAIL_LIMIT: ${{ inputs.long_tail_limit }}
+        run: |
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          summary="work/${stem}.gimsatul120/cube_sweep.json"
+          if [[ -f "$summary" ]]; then
+            python3 research/minimum_counterexample/extract_unknown_cubes.py \
+              "$summary" "work/${stem}.gimsatul120-unknown.cubes"
+            count="$(
+              grep -c '^a ' "work/${stem}.gimsatul120-unknown.cubes" || true
+            )"
+            if (( count > 0 && count <= LONG_TAIL_LIMIT )); then
+              python3 research/minimum_counterexample/solve_cubes.py \
+                "work/${stem}.cnf" \
+                "work/${stem}.gimsatul120-unknown.cubes" \
+                "work/${stem}.gimsatul1200" tools/gimsatul/gimsatul \
+                --seconds 1200 --jobs 1 --solver-kind gimsatul \
+                --solver-threads 4 --allow-partial
+            fi
+          fi
+
+      - name: Record source and tool hashes
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+        run: |
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          sha256sum \
+            "work/${stem}.cnf" \
+            "work/${stem}.json" \
+            "work/${stem}.row.cubes" \
+            tools/kissat/build/kissat \
+            tools/gimsatul/gimsatul \
+            > "work/${stem}.SHA256SUMS.txt"
+          git -C tools/kissat rev-parse HEAD > work/KISSAT_COMMIT.txt
+          git -C tools/gimsatul rev-parse HEAD > work/GIMSATUL_COMMIT.txt
+
+      - name: Upload deterministic search data and solver outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: order20-d${{ matrix.degree }}-p${{ matrix.cover_left }}
+          path: |
+            work/*.json
+            work/*.cubes
+            work/*.txt
+            work/*/cube_sweep.json
+            work/*/*.solver.out
+          retention-days: 14

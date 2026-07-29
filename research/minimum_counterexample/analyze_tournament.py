@@ -112,9 +112,28 @@ def main() -> None:
         metavar="U,V",
         help="flip one tournament edge before analysis; may be repeated",
     )
+    parser.add_argument(
+        "--delete",
+        action="append",
+        default=[],
+        type=int,
+        metavar="VERTEX",
+        help="delete a vertex before analysis; may be repeated",
+    )
     parser.add_argument("--write-matrix", type=Path)
     args = parser.parse_args()
     matrix = read_matrix(args.matrix)
+    deleted = set(args.delete)
+    if len(deleted) != len(args.delete):
+        raise ValueError("a deleted vertex is repeated")
+    if any(not 0 <= vertex < len(matrix) for vertex in deleted):
+        raise ValueError("a deleted vertex is outside the matrix")
+    retained = [
+        vertex for vertex in range(len(matrix)) if vertex not in deleted
+    ]
+    matrix = [
+        "".join(matrix[u][v] for v in retained) for u in retained
+    ]
     mutable = [list(row) for row in matrix]
     for specification in args.flip:
         u, v = map(int, specification.split(","))

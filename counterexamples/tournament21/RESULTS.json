@@ -1,0 +1,27 @@
+{
+  "status": "verified counterexample",
+  "order": 21,
+  "minimum_outdegree": 9,
+  "strong_vertices": [],
+  "outdegrees": [
+    9, 10, 10, 9, 9, 9, 10, 10, 11, 12, 9, 9, 9, 11, 11, 11, 9,
+    10, 10, 10, 12
+  ],
+  "maximum_matching_sizes": [
+    8, 9, 9, 8, 8, 8, 8, 9, 8, 8, 8, 8, 8, 9, 9, 9, 8, 9, 9, 9, 8
+  ],
+  "matrix_sha256": "9773f6f889db845bd727c726988b7017a99a8f3bff79896fed214b2aed9a6d5e",
+  "discovery": {
+    "method": "exact SAT cover encoding followed by deletion of a universal source",
+    "order22_branch": {
+      "minimum_outdegree": 9,
+      "root_cover_left": 2
+    }
+  },
+  "verification": {
+    "python": "finite-state matching DP plus complete Hall-subset enumeration",
+    "cpp": "augmenting-path maximum matching plus complete Hall-subset enumeration"
+  },
+  "current_bound": "14 <= n_min <= 21",
+  "minimum_order_claim": "not established; order 20 and smaller unresolved orders remain to be excluded or searched"
+}

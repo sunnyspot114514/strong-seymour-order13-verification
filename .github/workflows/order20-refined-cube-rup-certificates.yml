@@ -1,0 +1,105 @@
+name: Order-20 refined cube RUP certificates
+
+on:
+  workflow_dispatch:
+    inputs:
+      tasks:
+        description: JSON array of refined parent-cube tasks
+        required: true
+        type: string
+        default: >-
+          [{"degree":9,"cover_left":0,"parent_index":31,"depth":1}]
+
+permissions:
+  contents: read
+
+jobs:
+  certify:
+    name: d${{ matrix.degree }} p${{ matrix.cover_left }} c${{ matrix.parent_index }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.tasks) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build pinned Gimsatul
+        run: |
+          git clone --quiet https://github.com/arminbiere/gimsatul.git tools/gimsatul
+          git -C tools/gimsatul checkout --quiet 4664fd74c97f87e30e7f907181707679b6fa49f2
+          cd tools/gimsatul
+          ./configure
+          make -j4
+
+      - name: Build pinned upstream drat-trim
+        run: |
+          git clone --quiet https://github.com/marijnheule/drat-trim.git tools/drat-trim
+          git -C tools/drat-trim checkout --quiet 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
+          gcc tools/drat-trim/drat-trim.c -O2 -std=c99 \
+            -o tools/drat-trim/drat-trim
+
+      - name: Generate the branch and refined parent partition
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+          PARENT_INDEX: ${{ matrix.parent_index }}
+          DEPTH: ${{ matrix.depth }}
+        run: |
+          mkdir -p work certificate
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          python3 research/minimum_counterexample/generate_tournament_cnf.py \
+            20 "$DEGREE" "work/${stem}.cnf" \
+            --encoding conditional-cover \
+            --root-cover-left "$COVER_LEFT" \
+            --symmetry hierarchical-profile-ties
+          python3 research/minimum_counterexample/make_branch_row_cubes.py \
+            "work/${stem}.json" "work/${stem}.row.cubes"
+          prefix="work/${stem}.cube_${PARENT_INDEX}"
+          python3 research/minimum_counterexample/make_parent_refinement.py \
+            "work/${stem}.cnf" "work/${stem}.json" \
+            "work/${stem}.row.cubes" "$PARENT_INDEX" \
+            "${prefix}.cnf" "${prefix}.child.cubes" \
+            "${prefix}.refinement.json" --depth "$DEPTH"
+
+      - name: Produce and check the refined certificates
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+          PARENT_INDEX: ${{ matrix.parent_index }}
+        run: |
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          prefix="work/${stem}.cube_${PARENT_INDEX}"
+          python3 research/minimum_counterexample/certify_cubes.py \
+            "${prefix}.cnf" "${prefix}.child.cubes" \
+            certificate/refined \
+            tools/gimsatul/gimsatul tools/drat-trim/drat-trim \
+            --jobs "${{ matrix.jobs || 2 }}" \
+            --solver-threads "${{ matrix.solver_threads || 2 }}" \
+            --seconds 3600
+
+      - name: Record provenance
+        if: always()
+        run: |
+          git -C tools/gimsatul rev-parse HEAD \
+            > certificate/GIMSATUL_COMMIT.txt
+          git -C tools/drat-trim rev-parse HEAD \
+            > certificate/DRAT_TRIM_COMMIT.txt
+          gcc --version | head -n 1 > certificate/GCC_VERSION.txt
+
+      - name: Upload checked refinement
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: order20-refined-rup-d${{ matrix.degree }}-p${{ matrix.cover_left }}-c${{ matrix.parent_index }}
+          path: |
+            work/*.cnf
+            work/*.json
+            work/*.cubes
+            certificate/*.txt
+            certificate/**/*.json
+            certificate/**/*.log
+            certificate/**/*.xz
+          retention-days: 30

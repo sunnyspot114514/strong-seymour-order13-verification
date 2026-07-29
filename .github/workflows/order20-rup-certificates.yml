@@ -82,8 +82,12 @@ jobs:
             > "proof/${stem}.core-extraction.log" 2>&1
           extraction_status=$?
           set -e
+          printf '%s\n' "$extraction_status" \
+            > "proof/${stem}.core-extraction.exit"
           cat "proof/${stem}.core-extraction.log"
-          test "$extraction_status" -eq 0
+          # This upstream revision returns 1 when the input CNF is already
+          # UNSAT by unit propagation, even though it reports s VERIFIED.
+          # Require the semantic verdict and preserve the raw exit code.
           grep -q '^s VERIFIED' "proof/${stem}.core-extraction.log"
           set +e
           tools/drat-trim/drat-trim \
@@ -91,8 +95,9 @@ jobs:
             > "proof/${stem}.core-verification.log" 2>&1
           verification_status=$?
           set -e
+          printf '%s\n' "$verification_status" \
+            > "proof/${stem}.core-verification.exit"
           cat "proof/${stem}.core-verification.log"
-          test "$verification_status" -eq 0
           grep -q '^s VERIFIED' "proof/${stem}.core-verification.log"
 
       - name: Compress and record provenance

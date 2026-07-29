@@ -2,6 +2,13 @@ name: Order-22 parallel search
 
 on:
   workflow_dispatch:
+    inputs:
+      branches:
+        description: JSON array of {degree,cover_left} branch objects
+        required: true
+        type: string
+        default: >-
+          [{"degree":8,"cover_left":0},{"degree":8,"cover_left":1},{"degree":9,"cover_left":0},{"degree":9,"cover_left":1},{"degree":9,"cover_left":2},{"degree":9,"cover_left":3},{"degree":9,"cover_left":5},{"degree":9,"cover_left":6},{"degree":10,"cover_left":0},{"degree":10,"cover_left":1},{"degree":10,"cover_left":2},{"degree":10,"cover_left":3},{"degree":10,"cover_left":4},{"degree":10,"cover_left":5},{"degree":10,"cover_left":6},{"degree":10,"cover_left":7}]
 
 permissions:
   contents: read
@@ -14,23 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - {degree: 8, cover_left: 0}
-          - {degree: 8, cover_left: 1}
-          - {degree: 9, cover_left: 0}
-          - {degree: 9, cover_left: 1}
-          - {degree: 9, cover_left: 2}
-          - {degree: 9, cover_left: 3}
-          - {degree: 9, cover_left: 5}
-          - {degree: 9, cover_left: 6}
-          - {degree: 10, cover_left: 0}
-          - {degree: 10, cover_left: 1}
-          - {degree: 10, cover_left: 2}
-          - {degree: 10, cover_left: 3}
-          - {degree: 10, cover_left: 4}
-          - {degree: 10, cover_left: 5}
-          - {degree: 10, cover_left: 6}
-          - {degree: 10, cover_left: 7}
+        include: ${{ fromJSON(inputs.branches) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -95,6 +86,27 @@ jobs:
           else
             printf '%s\n' '{"counts":{"SAT":0,"UNSAT":0,"UNKNOWN":0,"ERROR":0}}' \
               > "work/${stem}.gimsatul60.json"
+          fi
+
+      - name: Extend small unresolved tails with four-thread Gimsatul
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+        run: |
+          stem="n22_d${DEGREE}p${COVER_LEFT}"
+          summary="work/${stem}.gimsatul60/cube_sweep.json"
+          if [[ -f "$summary" ]]; then
+            python3 research/minimum_counterexample/extract_unknown_cubes.py \
+              "$summary" "work/${stem}.gimsatul60-unknown.cubes"
+            count="$(grep -c '^a ' "work/${stem}.gimsatul60-unknown.cubes" || true)"
+            if (( count > 0 && count <= 10 )); then
+              python3 research/minimum_counterexample/solve_cubes.py \
+                "work/${stem}.cnf" \
+                "work/${stem}.gimsatul60-unknown.cubes" \
+                "work/${stem}.gimsatul600" tools/gimsatul/gimsatul \
+                --seconds 600 --jobs 1 --solver-kind gimsatul \
+                --solver-threads 4 --allow-partial
+            fi
           fi
 
       - name: Record source and tool hashes

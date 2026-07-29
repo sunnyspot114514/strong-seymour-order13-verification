@@ -94,7 +94,7 @@ jobs:
               > "work/${stem}.gimsatul120.json"
           fi
 
-      - name: Extend small unresolved tails with four-thread Gimsatul
+      - name: Extend small unresolved tails with four parallel Gimsatul workers
         env:
           DEGREE: ${{ matrix.degree }}
           COVER_LEFT: ${{ matrix.cover_left }}
@@ -113,8 +113,8 @@ jobs:
                 "work/${stem}.cnf" \
                 "work/${stem}.gimsatul120-unknown.cubes" \
                 "work/${stem}.gimsatul1200" tools/gimsatul/gimsatul \
-                --seconds 1200 --jobs 1 --solver-kind gimsatul \
-                --solver-threads 4 --allow-partial
+                --seconds 1200 --jobs 4 --solver-kind gimsatul \
+                --solver-threads 1 --allow-partial
             fi
           fi
 

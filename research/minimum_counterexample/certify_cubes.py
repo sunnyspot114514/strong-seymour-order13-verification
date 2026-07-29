@@ -246,7 +246,40 @@ def main() -> None:
         }
 
     records: list[dict[str, object]] = []
-    failure: BaseException | None = None
+    failures: list[dict[str, object]] = []
+    manifest_path = args.output / "certificate_manifest.json"
+
+    def write_manifest() -> None:
+        ordered_records = sorted(
+            records,
+            key=lambda record: int(record["cube_index"]),
+        )
+        result = {
+            "base_cnf": str(args.cnf),
+            "base_cnf_sha256": sha256(args.cnf),
+            "cubes": str(args.cubes),
+            "cubes_sha256": sha256(args.cubes),
+            "complete_partition": True,
+            "total_cube_count": len(cubes),
+            "cube_depth": len(cubes[0]),
+            "shards": args.shards,
+            "shard_index": args.shard_index,
+            "selected_cube_indices": [index for index, _ in selected],
+            "verified_cube_count": len(ordered_records),
+            "failed_cubes": sorted(
+                failures,
+                key=lambda failure: int(failure["cube_index"]),
+            ),
+            "records": ordered_records,
+        }
+        temporary = manifest_path.with_suffix(".json.tmp")
+        temporary.write_text(
+            json.dumps(result, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        temporary.replace(manifest_path)
+
+    write_manifest()
     with concurrent.futures.ThreadPoolExecutor(
         max_workers=args.jobs
     ) as executor:
@@ -269,7 +302,12 @@ def main() -> None:
                     flush=True,
                 )
             except BaseException as error:
-                failure = error
+                failures.append(
+                    {
+                        "cube_index": futures[future],
+                        "error": str(error),
+                    }
+                )
                 print(
                     json.dumps(
                         {
@@ -281,31 +319,12 @@ def main() -> None:
                     ),
                     flush=True,
                 )
-                for pending in futures:
-                    pending.cancel()
-                break
+            write_manifest()
 
-    records.sort(key=lambda record: int(record["cube_index"]))
-    result = {
-        "base_cnf": str(args.cnf),
-        "base_cnf_sha256": sha256(args.cnf),
-        "cubes": str(args.cubes),
-        "cubes_sha256": sha256(args.cubes),
-        "complete_partition": True,
-        "total_cube_count": len(cubes),
-        "cube_depth": len(cubes[0]),
-        "shards": args.shards,
-        "shard_index": args.shard_index,
-        "selected_cube_indices": [index for index, _ in selected],
-        "verified_cube_count": len(records),
-        "records": records,
-    }
-    (args.output / "certificate_manifest.json").write_text(
-        json.dumps(result, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    if failure is not None:
-        raise SystemExit(str(failure))
+    if failures:
+        raise SystemExit(
+            f"{len(failures)} cube certificate command(s) failed"
+        )
     if len(records) != len(selected):
         raise AssertionError("not every selected cube was certified")
 

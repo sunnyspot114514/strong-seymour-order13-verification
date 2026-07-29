@@ -1,0 +1,88 @@
+name: Order-22 d8p0 hard tails
+
+on:
+  workflow_dispatch:
+    inputs:
+      solver_seconds:
+        description: Per-leaf Gimsatul time limit
+        required: true
+        type: number
+        default: 10800
+
+permissions:
+  contents: read
+
+jobs:
+  solve-tail:
+    name: tail ${{ matrix.tail_index }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        tail_index: [0, 1, 2, 3, 4, 5, 6, 7]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build pinned Gimsatul
+        run: |
+          git clone --quiet https://github.com/arminbiere/gimsatul.git tools/gimsatul
+          git -C tools/gimsatul checkout --quiet 4664fd74c97f87e30e7f907181707679b6fa49f2
+          cd tools/gimsatul
+          ./configure
+          make -j4
+
+      - name: Generate the branch and select one hard row
+        env:
+          TAIL_INDEX: ${{ matrix.tail_index }}
+        run: |
+          mkdir -p work
+          python3 research/minimum_counterexample/generate_tournament_cnf.py \
+            22 8 work/n22_d8p0.cnf \
+            --encoding conditional-cover \
+            --root-cover-left 0 \
+            --symmetry hierarchical-profile-ties
+          python3 research/minimum_counterexample/make_branch_row_cubes.py \
+            work/n22_d8p0.json work/n22_d8p0.row.cubes
+          awk '{
+            negative = 0
+            for (field = 2; field < NF; ++field)
+              if ($field < 0) ++negative
+            if (negative <= 1) print
+          }' work/n22_d8p0.row.cubes > work/n22_d8p0.hard.cubes
+          sed -n "$((TAIL_INDEX + 1))p" \
+            work/n22_d8p0.hard.cubes > work/n22_d8p0.leaf.cubes
+          test "$(grep -c '^a ' work/n22_d8p0.hard.cubes)" -eq 8
+          test "$(grep -c '^a ' work/n22_d8p0.leaf.cubes)" -eq 1
+
+      - name: Solve the selected leaf
+        env:
+          SOLVER_LIMIT: ${{ inputs.solver_seconds }}
+        run: |
+          python3 research/minimum_counterexample/solve_cubes.py \
+            work/n22_d8p0.cnf work/n22_d8p0.leaf.cubes \
+            work/solve tools/gimsatul/gimsatul \
+            --seconds "$SOLVER_LIMIT" --jobs 1 \
+            --solver-kind gimsatul --solver-threads 4 --allow-partial
+
+      - name: Record source and tool hashes
+        run: |
+          sha256sum \
+            work/n22_d8p0.cnf \
+            work/n22_d8p0.json \
+            work/n22_d8p0.leaf.cubes \
+            tools/gimsatul/gimsatul \
+            > work/SHA256SUMS.txt
+          git -C tools/gimsatul rev-parse HEAD > work/GIMSATUL_COMMIT.txt
+
+      - name: Upload deterministic search summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: order22-d8p0-tail-${{ matrix.tail_index }}
+          path: |
+            work/*.json
+            work/*.cubes
+            work/*.txt
+            work/solve/cube_sweep.json
+          retention-days: 14

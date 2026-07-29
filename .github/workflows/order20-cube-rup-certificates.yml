@@ -68,7 +68,9 @@ jobs:
             "work/${stem}.cnf" "work/${stem}.row.cubes" \
             "certificate/shard${SHARD}" \
             tools/gimsatul/gimsatul tools/drat-trim/drat-trim \
-            --jobs 4 --solver-threads 1 --seconds 3600 \
+            --jobs "${{ matrix.jobs || 4 }}" \
+            --solver-threads "${{ matrix.solver_threads || 1 }}" \
+            --seconds 3600 \
             --shards "$SHARDS" --shard-index "$SHARD"
 
       - name: Record provenance

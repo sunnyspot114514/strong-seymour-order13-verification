@@ -1,0 +1,503 @@
+{
+  "verified": true,
+  "order": 23,
+  "minimum_outdegree": 10,
+  "strong_vertices": [],
+  "matrix_sha256": "c6789b8adaf98b5d1da924a453243cad253d385263a7c08652f5bc7ff80f7612",
+  "vertices": [
+    {
+      "vertex": 0,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "hall_Gamma": [
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "vertex": 1,
+      "outdegree": 12,
+      "strict_second": 10,
+      "matching": 10,
+      "hall_S": [
+        2
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": 2,
+      "outdegree": 11,
+      "strict_second": 10,
+      "matching": 10,
+      "hall_S": [
+        3,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "hall_Gamma": [
+        0,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "vertex": 3,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "hall_Gamma": [
+        0,
+        5,
+        6,
+        7,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "vertex": 4,
+      "outdegree": 11,
+      "strict_second": 11,
+      "matching": 10,
+      "hall_S": [
+        1,
+        2,
+        12,
+        13,
+        14
+      ],
+      "hall_Gamma": [
+        0,
+        3,
+        15,
+        19
+      ]
+    },
+    {
+      "vertex": 5,
+      "outdegree": 11,
+      "strict_second": 11,
+      "matching": 10,
+      "hall_S": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "hall_Gamma": [
+        0,
+        9,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ]
+    },
+    {
+      "vertex": 6,
+      "outdegree": 12,
+      "strict_second": 10,
+      "matching": 10,
+      "hall_S": [
+        7,
+        10
+      ],
+      "hall_Gamma": [
+        5
+      ]
+    },
+    {
+      "vertex": 7,
+      "outdegree": 12,
+      "strict_second": 10,
+      "matching": 10,
+      "hall_S": [
+        10
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": 8,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        1,
+        2,
+        3,
+        4,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "hall_Gamma": [
+        0,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ]
+    },
+    {
+      "vertex": 9,
+      "outdegree": 11,
+      "strict_second": 11,
+      "matching": 10,
+      "hall_S": [
+        5,
+        6,
+        7,
+        10
+      ],
+      "hall_Gamma": [
+        3,
+        8,
+        15
+      ]
+    },
+    {
+      "vertex": 10,
+      "outdegree": 11,
+      "strict_second": 10,
+      "matching": 10,
+      "hall_S": [
+        1,
+        2,
+        3,
+        4,
+        8,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "hall_Gamma": [
+        0,
+        9,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ]
+    },
+    {
+      "vertex": 11,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        1,
+        2,
+        3,
+        4,
+        12,
+        13,
+        14,
+        15
+      ],
+      "hall_Gamma": [
+        9,
+        16,
+        17,
+        18,
+        19,
+        21,
+        22
+      ]
+    },
+    {
+      "vertex": 12,
+      "outdegree": 11,
+      "strict_second": 11,
+      "matching": 10,
+      "hall_S": [
+        3,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "hall_Gamma": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "vertex": 13,
+      "outdegree": 13,
+      "strict_second": 9,
+      "matching": 9,
+      "hall_S": [
+        1,
+        2
+      ],
+      "hall_Gamma": [
+        12
+      ]
+    },
+    {
+      "vertex": 14,
+      "outdegree": 11,
+      "strict_second": 11,
+      "matching": 10,
+      "hall_S": [
+        3,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "hall_Gamma": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "vertex": 15,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "hall_Gamma": [
+        5,
+        6,
+        7,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "vertex": 16,
+      "outdegree": 12,
+      "strict_second": 10,
+      "matching": 10,
+      "hall_S": [
+        17,
+        21
+      ],
+      "hall_Gamma": [
+        18
+      ]
+    },
+    {
+      "vertex": 17,
+      "outdegree": 11,
+      "strict_second": 10,
+      "matching": 10,
+      "hall_S": [
+        0,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        19,
+        22
+      ],
+      "hall_Gamma": [
+        1,
+        2,
+        3,
+        4,
+        12,
+        13,
+        14,
+        15,
+        20
+      ]
+    },
+    {
+      "vertex": 18,
+      "outdegree": 11,
+      "strict_second": 11,
+      "matching": 10,
+      "hall_S": [
+        0,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        19,
+        22
+      ],
+      "hall_Gamma": [
+        1,
+        2,
+        3,
+        4,
+        12,
+        13,
+        14,
+        15,
+        20
+      ]
+    },
+    {
+      "vertex": 19,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        0,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "hall_Gamma": [
+        1,
+        2,
+        3,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "vertex": 20,
+      "outdegree": 11,
+      "strict_second": 11,
+      "matching": 10,
+      "hall_S": [
+        16,
+        17,
+        18,
+        21
+      ],
+      "hall_Gamma": [
+        11,
+        19,
+        22
+      ]
+    },
+    {
+      "vertex": 21,
+      "outdegree": 12,
+      "strict_second": 10,
+      "matching": 10,
+      "hall_S": [
+        17
+      ],
+      "hall_Gamma": []
+    },
+    {
+      "vertex": 22,
+      "outdegree": 10,
+      "strict_second": 12,
+      "matching": 9,
+      "hall_S": [
+        0,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        19
+      ],
+      "hall_Gamma": [
+        1,
+        2,
+        3,
+        4,
+        12,
+        13,
+        14,
+        15
+      ]
+    }
+  ]
+}

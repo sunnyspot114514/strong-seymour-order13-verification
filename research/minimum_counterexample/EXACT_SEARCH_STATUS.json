@@ -1,6 +1,18 @@
 {
   "date": "2026-07-29",
-  "target": "23-vertex tournament with no strong Seymour vertex",
+  "target": "determine the minimum order below the verified 23-vertex counterexample",
+  "current_bound": "14 <= n_min <= 23",
+  "order23_counterexample": {
+    "result": "SAT and independently verified",
+    "canonical_branch": {
+      "minimum_outdegree": 10,
+      "root_cover_left": 4
+    },
+    "path": "../../counterexamples/tournament23/",
+    "matrix_sha256": "c6789b8adaf98b5d1da924a453243cad253d385263a7c08652f5bc7ff80f7612",
+    "strong_vertices": []
+  },
+  "order23_branch_history_note": "The branch tables below are retained as the pre-discovery exploratory snapshot; they are no longer needed to establish existence at order 23.",
   "branching": {
     "root": "a minimum-outdegree vertex relabelled as vertex 0",
     "d_range": [

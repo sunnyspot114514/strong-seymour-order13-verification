@@ -2,27 +2,29 @@
 
 [US English](README.md) | [CN 中文说明](README_zh.md)
 
-This repository contains reproducible verification artifacts for three
+This repository contains reproducible verification artifacts for four
 finite results:
 
 1. every regular tournament of order 13 has at least eleven strong Seymour
    vertices, and the bound is sharp;
-2. an explicit tournament of order 24 has no strong Seymour vertex;
-3. an explicit six-cluster oriented graph of order 36 has no strong Seymour
+2. an explicit tournament of order 23 has no strong Seymour vertex;
+3. a structured tournament construction of order 24 has no strong Seymour
+   vertex;
+4. an explicit six-cluster oriented graph of order 36 has no strong Seymour
    vertex and scales to an infinite family.
 
 The counterexamples, direct Hall certificates, and independent audits are in
 [`counterexamples/`](counterexamples/). The current order bounds are
 
 ```text
-14 <= n_oriented <= n_tournament <= 24.
+14 <= n_oriented <= n_tournament <= 23.
 ```
 
 Active work on the minimum tournament counterexample—including exact
-23-vertex branches, near-counterexamples, and weighted-template searches—is
+searches at orders 14–22 and weighted-template searches—is
 in [`research/minimum_counterexample/`](research/minimum_counterexample/).
 The research status distinguishes completed solver results from timeouts and
-does not claim that order 24 is minimal.
+does not claim that order 23 is minimal.
 
 The order-13 exact result is:
 
@@ -37,6 +39,11 @@ The strengthened experiment, certificates, and tight witness are in
 
 ## Explicit counterexamples
 
+The order-23 counterexample was found by the exact SAT encoding and then
+verified independently by finite-state matching DP, a C++ augmenting-path
+implementation, and complete Hall-subset enumeration. Its standalone package
+is in [`counterexamples/tournament23/`](counterexamples/tournament23/).
+
 The order-24 construction substitutes transitive tournaments of sizes
 
 ```text
@@ -50,10 +57,9 @@ finite-state-DP, and NetworkX checks all find zero strong vertices.
 
 The earlier order-36 construction uses six independent clusters of sizes
 `(11,7,3,3,3,9)`. It remains useful as a particularly small template and an
-explicit infinite family, although the order-24 tournament gives the
-stronger upper bound.
+explicit infinite family.
 
-Neither construction is claimed to have minimum possible order.
+None of the constructions is claimed to have minimum possible order.
 
 ## Evidence at a glance
 
@@ -166,6 +172,6 @@ not depend on SAT unsatisfiability: they are reconstructed from small
 templates and verified directly by Hall defects and maximum matching.
 
 The current arXiv v2 of Bai, Li, and Park already records an order-36
-counterexample communicated by David Dzitsoev. The order-24 construction
-published here improves the explicit tournament upper bound; this repository
-does not claim priority for the first counterexample.
+counterexample communicated by David Dzitsoev. This repository now improves
+its explicit tournament upper bound to 23, but does not claim priority for
+the first counterexample.

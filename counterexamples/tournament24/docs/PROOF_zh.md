@@ -55,10 +55,11 @@
 
 ## 结论与边界
 
-该构造证明 strong Seymour 猜想即使限制在 tournament 上也为假，并给出
+该构造证明 strong Seymour 猜想即使限制在 tournament 上也为假，并曾给出
 
 ```text
 14 <= 最小 tournament 反例阶数 <= 24.
 ```
 
-下界来自已验证的所有至多 13 阶 oriented graph 情形。这里没有证明 24 是全局最小阶数。
+下界来自已验证的所有至多 13 阶 oriented graph 情形。仓库后来找到的
+23 阶反例已把上界改进为 23；这里没有证明 24 或 23 是全局最小阶数。

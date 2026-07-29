@@ -40,11 +40,13 @@ See [`docs/PROOF_zh.md`](docs/PROOF_zh.md) for the hand-checkable argument
 and [`audit/AUDIT_REPORT.md`](audit/AUDIT_REPORT.md) for the independent
 audit.
 
-Together with the separate order-at-most-13 verification, this gives
+This construction originally gave
 
 ```text
 14 <= n_oriented <= n_tournament <= 24.
 ```
 
-It does not prove that 24 is globally minimal. The construction has not yet
+The newer [`../tournament23/`](../tournament23/) package improves the
+repository-wide upper bound to 23. This construction remains useful for its
+compact weighted-blow-up proof. It does not prove minimality and has not yet
 been peer reviewed.

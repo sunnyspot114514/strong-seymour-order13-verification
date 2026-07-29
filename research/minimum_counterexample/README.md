@@ -2,9 +2,12 @@
 
 [US English](README.md) | [CN 中文说明](README_zh.md)
 
-This directory contains exploratory, reproducible code for deciding whether
-the published order-24 tournament counterexample can be reduced. Search
-failures and solver timeouts are not nonexistence proofs.
+This directory contains exploratory, reproducible code for reducing the
+smallest known tournament counterexample. The exact search found and
+independently verified a 23-vertex counterexample in branch `d=10,p=4`;
+its frozen package is in
+[`counterexamples/tournament23/`](../../counterexamples/tournament23/).
+Search failures and solver timeouts are not nonexistence proofs.
 
 ## Exact formulation
 
@@ -119,17 +122,17 @@ feasible at total weight 24.
 
 As of 2026-07-29:
 
+- branch `d=10,p=4` is SAT and its model is a verified 23-vertex
+  counterexample with zero strong vertices;
+- the current strict bound is `14 <= n_min <= 23`;
+- the exact minimum-order search has therefore moved to orders 14–22;
 - the fixed order-24 positive control is SAT and independently verified;
 - the six order-13 regular-tournament branches are UNSAT;
-- all order-23 branches with minimum outdegree 6 are UNSAT;
-- the completed higher-degree branches and all unresolved branches are listed
-  precisely in `EXACT_SEARCH_STATUS.json`;
-- reproducible local searches at minimum outdegrees 6 and 7 reach one
-  remaining strong vertex, but have not found an order-23 counterexample.
 - the base 10-point blow-up template and every template at edge-flip distance
   at most two are infeasible at total weight 23; see
   `STRUCTURED_RESULTS.json`.
 
-These are working results. A branch is promoted to a certified lower bound
-only after every branch is complete and its UNSAT proof is checked by a
-standard proof verifier.
+The order-23 SAT witness is a checked counterexample, not a bounded-run
+inference. A smaller order is promoted to an excluded lower bound only after
+every branch is complete and its UNSAT proof is checked by a standard proof
+verifier.

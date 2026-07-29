@@ -1,0 +1,106 @@
+name: Order-20 sharded cube RUP certificates
+
+on:
+  workflow_dispatch:
+    inputs:
+      tasks:
+        description: JSON array of {degree,cover_left,shards,shard} tasks
+        required: true
+        type: string
+        default: >-
+          [{"degree":8,"cover_left":0,"shards":4,"shard":0},{"degree":8,"cover_left":0,"shards":4,"shard":1},{"degree":8,"cover_left":0,"shards":4,"shard":2},{"degree":8,"cover_left":0,"shards":4,"shard":3},{"degree":9,"cover_left":0,"shards":4,"shard":0},{"degree":9,"cover_left":0,"shards":4,"shard":1},{"degree":9,"cover_left":0,"shards":4,"shard":2},{"degree":9,"cover_left":0,"shards":4,"shard":3},{"degree":9,"cover_left":1,"shards":4,"shard":0},{"degree":9,"cover_left":1,"shards":4,"shard":1},{"degree":9,"cover_left":1,"shards":4,"shard":2},{"degree":9,"cover_left":1,"shards":4,"shard":3},{"degree":9,"cover_left":2,"shards":4,"shard":0},{"degree":9,"cover_left":2,"shards":4,"shard":1},{"degree":9,"cover_left":2,"shards":4,"shard":2},{"degree":9,"cover_left":2,"shards":4,"shard":3}]
+
+permissions:
+  contents: read
+
+jobs:
+  certify:
+    name: d${{ matrix.degree }} p${{ matrix.cover_left }} s${{ matrix.shard }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.tasks) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build pinned Gimsatul
+        run: |
+          git clone --quiet https://github.com/arminbiere/gimsatul.git tools/gimsatul
+          git -C tools/gimsatul checkout --quiet 4664fd74c97f87e30e7f907181707679b6fa49f2
+          cd tools/gimsatul
+          ./configure
+          make -j4
+
+      - name: Build pinned upstream drat-trim
+        run: |
+          git clone --quiet https://github.com/marijnheule/drat-trim.git tools/drat-trim
+          git -C tools/drat-trim checkout --quiet 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
+          gcc tools/drat-trim/drat-trim.c -O2 -std=c99 \
+            -o tools/drat-trim/drat-trim
+
+      - name: Generate the branch and verify its complete row partition
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+        run: |
+          mkdir -p work certificate
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          python3 research/minimum_counterexample/generate_tournament_cnf.py \
+            20 "$DEGREE" "work/${stem}.cnf" \
+            --encoding conditional-cover \
+            --root-cover-left "$COVER_LEFT" \
+            --symmetry hierarchical-profile-ties
+          python3 research/minimum_counterexample/make_branch_row_cubes.py \
+            "work/${stem}.json" "work/${stem}.row.cubes"
+
+      - name: Produce and check this certificate shard
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+          SHARDS: ${{ matrix.shards }}
+          SHARD: ${{ matrix.shard }}
+        run: |
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          python3 research/minimum_counterexample/certify_cubes.py \
+            "work/${stem}.cnf" "work/${stem}.row.cubes" \
+            "certificate/shard${SHARD}" \
+            tools/gimsatul/gimsatul tools/drat-trim/drat-trim \
+            --jobs 4 --solver-threads 1 --seconds 3600 \
+            --shards "$SHARDS" --shard-index "$SHARD"
+
+      - name: Record provenance
+        if: always()
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+        run: |
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          git -C tools/gimsatul rev-parse HEAD \
+            > certificate/GIMSATUL_COMMIT.txt
+          git -C tools/drat-trim rev-parse HEAD \
+            > certificate/DRAT_TRIM_COMMIT.txt
+          gcc --version | head -n 1 > certificate/GCC_VERSION.txt
+          sha256sum \
+            "work/${stem}.cnf" \
+            "work/${stem}.json" \
+            "work/${stem}.row.cubes" \
+            research/minimum_counterexample/certify_cubes.py \
+            > certificate/INPUT_SHA256SUMS.txt
+
+      - name: Upload checked shard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: order20-cube-rup-d${{ matrix.degree }}-p${{ matrix.cover_left }}-s${{ matrix.shard }}
+          path: |
+            work/*.cnf
+            work/*.json
+            work/*.cubes
+            certificate/*.txt
+            certificate/**/*.json
+            certificate/**/*.log
+            certificate/**/*.xz
+          retention-days: 30

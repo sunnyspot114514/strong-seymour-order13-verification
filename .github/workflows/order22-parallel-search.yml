@@ -9,6 +9,11 @@ on:
         type: string
         default: >-
           [{"degree":8,"cover_left":0},{"degree":8,"cover_left":1},{"degree":9,"cover_left":0},{"degree":9,"cover_left":1},{"degree":9,"cover_left":2},{"degree":9,"cover_left":3},{"degree":9,"cover_left":5},{"degree":9,"cover_left":6},{"degree":10,"cover_left":0},{"degree":10,"cover_left":1},{"degree":10,"cover_left":2},{"degree":10,"cover_left":3},{"degree":10,"cover_left":4},{"degree":10,"cover_left":5},{"degree":10,"cover_left":6},{"degree":10,"cover_left":7}]
+      long_tail_limit:
+        description: Run 600-second four-thread leaves up to this count
+        required: true
+        type: number
+        default: 10
 
 permissions:
   contents: read
@@ -92,6 +97,7 @@ jobs:
         env:
           DEGREE: ${{ matrix.degree }}
           COVER_LEFT: ${{ matrix.cover_left }}
+          LONG_TAIL_LIMIT: ${{ inputs.long_tail_limit }}
         run: |
           stem="n22_d${DEGREE}p${COVER_LEFT}"
           summary="work/${stem}.gimsatul60/cube_sweep.json"
@@ -99,7 +105,7 @@ jobs:
             python3 research/minimum_counterexample/extract_unknown_cubes.py \
               "$summary" "work/${stem}.gimsatul60-unknown.cubes"
             count="$(grep -c '^a ' "work/${stem}.gimsatul60-unknown.cubes" || true)"
-            if (( count > 0 && count <= 10 )); then
+            if (( count > 0 && count <= LONG_TAIL_LIMIT )); then
               python3 research/minimum_counterexample/solve_cubes.py \
                 "work/${stem}.cnf" \
                 "work/${stem}.gimsatul60-unknown.cubes" \

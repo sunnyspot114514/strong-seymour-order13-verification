@@ -59,14 +59,20 @@ jobs:
           DEGREE: ${{ matrix.degree }}
           COVER_LEFT: ${{ matrix.cover_left }}
           PARENT_INDEX: ${{ matrix.parent_index }}
+          EXACT_SEQUENTIAL: ${{ matrix.exact_sequential || false }}
         run: |
           mkdir -p work certificate
           stem="n20_d${DEGREE}p${COVER_LEFT}"
+          exact_args=()
+          if [[ "$EXACT_SEQUENTIAL" == "true" ]]; then
+            exact_args+=(--exact-sequential)
+          fi
           python3 research/minimum_counterexample/generate_tournament_cnf.py \
             20 "$DEGREE" "work/${stem}.cnf" \
             --encoding conditional-cover \
             --root-cover-left "$COVER_LEFT" \
-            --symmetry hierarchical-profile-ties
+            --symmetry hierarchical-profile-ties \
+            "${exact_args[@]}"
           python3 research/minimum_counterexample/make_branch_row_cubes.py \
             "work/${stem}.json" "work/${stem}.row.cubes"
           prefix="work/${stem}.cube_${PARENT_INDEX}"

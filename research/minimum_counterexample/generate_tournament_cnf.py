@@ -18,10 +18,11 @@ from pathlib import Path
 
 
 class CNF:
-    def __init__(self) -> None:
+    def __init__(self, exact_sequential: bool = False) -> None:
         self.variable_count = 0
         self.clauses: list[list[int]] = []
         self.names: dict[tuple, int] = {}
+        self.exact_sequential = exact_sequential
 
     def variable(self, name: tuple) -> int:
         if name not in self.names:
@@ -66,6 +67,64 @@ class CNF:
             for index in range(1, count)
             for total in range(1, min(index, bound) + 1)
         }
+        if self.exact_sequential:
+            # Give every sequential-counter variable its exact threshold
+            # meaning, even when the at-most constraint is gated off.  This
+            # removes extension-variable freedom without changing the
+            # projected solutions on the input literals.
+            for index in range(1, count):
+                self.add(-literals[index - 1], sequential[index, 1])
+                if index == 1:
+                    self.add(-sequential[index, 1], literals[index - 1])
+                else:
+                    self.add(
+                        -sequential[index - 1, 1],
+                        sequential[index, 1],
+                    )
+                    self.add(
+                        -sequential[index, 1],
+                        literals[index - 1],
+                        sequential[index - 1, 1],
+                    )
+            for index in range(2, count):
+                for total in range(2, min(index, bound) + 1):
+                    self.add(
+                        -literals[index - 1],
+                        -sequential[index - 1, total - 1],
+                        sequential[index, total],
+                    )
+                    previous_same = sequential.get((index - 1, total))
+                    if previous_same is not None:
+                        self.add(
+                            -previous_same,
+                            sequential[index, total],
+                        )
+                        self.add(
+                            -sequential[index, total],
+                            previous_same,
+                            literals[index - 1],
+                        )
+                        self.add(
+                            -sequential[index, total],
+                            previous_same,
+                            sequential[index - 1, total - 1],
+                        )
+                    else:
+                        self.add(
+                            -sequential[index, total],
+                            literals[index - 1],
+                        )
+                        self.add(
+                            -sequential[index, total],
+                            sequential[index - 1, total - 1],
+                        )
+            for index in range(bound + 1, count + 1):
+                self.add(
+                    *([gate] if gate is not None else []),
+                    -literals[index - 1],
+                    -sequential[index - 1, bound],
+                )
+            return
         for index in range(1, count):
             self.add(-literals[index - 1], sequential[index, 1])
         for index in range(2, count):
@@ -147,10 +206,11 @@ def build(
     encoding: str = "hall",
     root_cover_left: int | None = None,
     symmetry: str = "hamilton",
+    exact_sequential: bool = False,
 ) -> tuple[CNF, dict]:
     if not 0 <= root_degree < order:
         raise ValueError("invalid root degree")
-    cnf = CNF()
+    cnf = CNF(exact_sequential=exact_sequential)
     orientation = {
         (u, v): cnf.variable(("orientation", u, v))
         for u in range(order)
@@ -844,7 +904,11 @@ def build(
         },
         "encoding": encoding,
         "symmetry": symmetry,
-        "cardinality_encoder": "triangular_sinz_sequential",
+        "cardinality_encoder": (
+            "exact_triangular_sequential"
+            if exact_sequential
+            else "triangular_sinz_sequential"
+        ),
     }
     if root_cover_left is not None:
         metadata["root_cover_left"] = root_cover_left
@@ -913,6 +977,14 @@ def main() -> None:
             "complete symmetry break inside the four root-membership blocks"
         ),
     )
+    parser.add_argument(
+        "--exact-sequential",
+        action="store_true",
+        help=(
+            "define every sequential-counter threshold variable in both "
+            "directions, including inside gated constraints"
+        ),
+    )
     args = parser.parse_args()
     if args.fix_matrix is not None and args.near_matrix is not None:
         parser.error("--fix-matrix and --near-matrix are mutually exclusive")
@@ -945,6 +1017,7 @@ def main() -> None:
         args.encoding,
         args.root_cover_left,
         args.symmetry,
+        args.exact_sequential,
     )
     if fixed_matrix_sha256 is not None:
         if args.fix_matrix is not None:

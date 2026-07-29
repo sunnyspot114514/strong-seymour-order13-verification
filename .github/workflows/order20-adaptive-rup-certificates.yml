@@ -92,6 +92,7 @@ jobs:
             --additional-depth "${{ matrix.additional_depth || 6 }}" \
             --seconds "${{ matrix.seconds || 120 }}" \
             --maximum-seconds "${{ matrix.maximum_seconds || 600 }}" \
+            --constant-rounds "${{ matrix.constant_rounds || 1 }}" \
             --jobs "${{ matrix.jobs || 4 }}" \
             --rounds "${{ matrix.rounds || 8 }}" \
             --xz-level "${{ matrix.xz_level || 1 }}"

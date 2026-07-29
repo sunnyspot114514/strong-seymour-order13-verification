@@ -121,12 +121,15 @@ def main() -> None:
     parser.add_argument("--seconds", type=int, default=3600)
     parser.add_argument("--shards", type=int, default=1)
     parser.add_argument("--shard-index", type=int, default=0)
+    parser.add_argument("--xz-level", type=int, default=9)
     args = parser.parse_args()
 
     if args.jobs < 1 or args.solver_threads < 1 or args.seconds < 1:
         raise ValueError("jobs, solver threads, and seconds must be positive")
     if args.shards < 1 or not 0 <= args.shard_index < args.shards:
         raise ValueError("invalid shard specification")
+    if not 0 <= args.xz_level <= 9:
+        raise ValueError("xz level must be between 0 and 9")
 
     lines, header_index, variables, clauses = parse_cnf(args.cnf)
     cubes = read_complete_cubes(args.cubes, variables)
@@ -220,7 +223,7 @@ def main() -> None:
             )
 
         subprocess.run(
-            ["xz", "-T1", "-9", "-f", str(core)],
+            ["xz", "-T1", f"-{args.xz_level}", "-f", str(core)],
             check=True,
         )
         compressed_core_sha256 = sha256(compressed_core)
@@ -264,6 +267,7 @@ def main() -> None:
             "cube_depth": len(cubes[0]),
             "shards": args.shards,
             "shard_index": args.shard_index,
+            "xz_level": args.xz_level,
             "selected_cube_indices": [index for index, _ in selected],
             "verified_cube_count": len(ordered_records),
             "failed_cubes": sorted(

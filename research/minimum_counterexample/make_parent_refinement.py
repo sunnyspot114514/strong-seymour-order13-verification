@@ -36,6 +36,11 @@ def main() -> None:
     parser.add_argument("child_cubes", type=Path)
     parser.add_argument("output_metadata", type=Path)
     parser.add_argument("--depth", type=int, default=1)
+    parser.add_argument(
+        "--selection-order",
+        choices=("row-major", "column-major", "diagonal"),
+        default="row-major",
+    )
     args = parser.parse_args()
     if args.depth < 1:
         raise ValueError("depth must be positive")
@@ -56,14 +61,33 @@ def main() -> None:
         raise ValueError("branch has no second uncovered-out cross row")
 
     orientation = metadata["orientation_variables"]
+    sources = uncovered_out[1:]
+    if args.selection_order == "row-major":
+        pairs = [
+            (source, target)
+            for source in sources
+            for target in covered_in
+        ]
+    elif args.selection_order == "column-major":
+        pairs = [
+            (source, target)
+            for target in covered_in
+            for source in sources
+        ]
+    else:
+        pairs = [
+            (source, covered_in[(source_index + offset) % len(covered_in)])
+            for offset in range(len(covered_in))
+            for source_index, source in enumerate(sources)
+        ]
+
     candidates = []
-    for source in uncovered_out[1:]:
-        for target in covered_in:
-            variable = int(
-                orientation[f"{min(source, target)},{max(source, target)}"]
-            )
-            if variable not in fixed and variable not in candidates:
-                candidates.append(variable)
+    for source, target in pairs:
+        variable = int(
+            orientation[f"{min(source, target)},{max(source, target)}"]
+        )
+        if variable not in fixed and variable not in candidates:
+            candidates.append(variable)
     if len(candidates) < args.depth:
         raise ValueError("not enough unfixed cross-row variables")
     split_variables = candidates[: args.depth]
@@ -123,6 +147,7 @@ def main() -> None:
         "child_cubes": args.child_cubes.name,
         "child_cubes_sha256": sha256(args.child_cubes),
         "split_variables": split_variables,
+        "selection_order": args.selection_order,
         "child_count": 1 << len(split_variables),
         "complete_partition": True,
     }

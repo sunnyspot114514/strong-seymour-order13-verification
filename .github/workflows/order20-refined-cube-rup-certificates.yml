@@ -62,7 +62,8 @@ jobs:
             "work/${stem}.cnf" "work/${stem}.json" \
             "work/${stem}.row.cubes" "$PARENT_INDEX" \
             "${prefix}.cnf" "${prefix}.child.cubes" \
-            "${prefix}.refinement.json" --depth "$DEPTH"
+            "${prefix}.refinement.json" --depth "$DEPTH" \
+            --selection-order "${{ matrix.selection_order || 'row-major' }}"
 
       - name: Produce and check the refined certificates
         env:
@@ -78,7 +79,8 @@ jobs:
             tools/gimsatul/gimsatul tools/drat-trim/drat-trim \
             --jobs "${{ matrix.jobs || 2 }}" \
             --solver-threads "${{ matrix.solver_threads || 2 }}" \
-            --seconds 3600
+            --seconds 3600 \
+            --xz-level "${{ matrix.xz_level || 9 }}"
 
       - name: Record provenance
         if: always()

@@ -67,6 +67,7 @@ def main() -> None:
     parser.add_argument("--initial-depth", type=int, default=8)
     parser.add_argument("--additional-depth", type=int, default=6)
     parser.add_argument("--seconds", type=int, default=120)
+    parser.add_argument("--maximum-seconds", type=int, default=600)
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--rounds", type=int, default=8)
     parser.add_argument("--xz-level", type=int, default=1)
@@ -78,6 +79,7 @@ def main() -> None:
         args.initial_depth < 1
         or args.additional_depth < 1
         or args.seconds < 1
+        or args.maximum_seconds < args.seconds
         or args.jobs < 1
         or args.rounds < 1
         or not 0 <= args.xz_level <= 9
@@ -115,6 +117,10 @@ def main() -> None:
             args.initial_depth
             if round_number == 1
             else args.additional_depth
+        )
+        round_seconds = min(
+            args.maximum_seconds,
+            args.seconds * (2 ** (round_number - 1)),
         )
         run(
             [
@@ -158,7 +164,7 @@ def main() -> None:
                 "--solver-threads",
                 "1",
                 "--seconds",
-                str(args.seconds),
+                str(round_seconds),
                 "--xz-level",
                 str(args.xz_level),
                 "--coverage",
@@ -214,6 +220,7 @@ def main() -> None:
             "verified_count": len(records),
             "failed_count": len(ordered_failed),
             "failed_indices": ordered_failed,
+            "seconds_per_command": round_seconds,
         }
         rounds.append(round_record)
 
@@ -224,7 +231,8 @@ def main() -> None:
                 "parent_cnf_sha256": sha256(args.parent_cnf),
                 "initial_depth": args.initial_depth,
                 "additional_depth": args.additional_depth,
-                "seconds_per_command": args.seconds,
+                "initial_seconds_per_command": args.seconds,
+                "maximum_seconds_per_command": args.maximum_seconds,
                 "jobs": args.jobs,
                 "xz_level": args.xz_level,
                 "round_count": round_number,

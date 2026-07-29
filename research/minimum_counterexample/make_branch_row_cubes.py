@@ -35,8 +35,6 @@ def main() -> None:
     )
     if not uncovered_out:
         raise ValueError("the uncovered out-neighbour block is empty")
-    if not covered_in:
-        raise ValueError("the covered in-neighbour block is empty")
 
     # The canonical root-cover labelling used by generate_tournament_cnf.py:
     #
@@ -47,18 +45,26 @@ def main() -> None:
     #
     # Fixing every orientation in either selected cross-block row gives an
     # exact fixed-variable case partition.
-    if args.axis == "out-row":
+    orientation = metadata["orientation_variables"]
+    if not covered_in:
+        # In the p=d-1 branch the covered in-neighbour block is empty, so
+        # there is no cross-block row to split.  Partition on the already
+        # forced root arc 0->1 instead.  The negative cube closes
+        # immediately, while the positive cube is equivalent to the base
+        # branch; together the two cubes remain a literal-complete split.
+        source = 0
+        targets = [1]
+    elif args.axis == "out-row":
         source = uncovered_out[0]
         targets = covered_in
     else:
         source = covered_in[0]
         targets = uncovered_out
-    orientation = metadata["orientation_variables"]
     variables = [
         int(orientation[f"{min(source, target)},{max(source, target)}"])
         for target in targets
     ]
-    if not (0 < source < order):
+    if not (0 <= source < order):
         raise AssertionError("invalid source vertex")
     if len(set(variables)) != len(variables):
         raise AssertionError("duplicate split variable")

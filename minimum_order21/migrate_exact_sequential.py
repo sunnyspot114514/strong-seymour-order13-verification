@@ -44,6 +44,7 @@ def write_json(path: Path, value: object) -> None:
     temporary.write_text(
         json.dumps(value, indent=2) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     temporary.replace(path)
 
@@ -187,7 +188,8 @@ def migrate_branch(
     ):
         raise ValueError(f"{directory}: exact regeneration mismatch")
     temporary_base.replace(base)
-    temporary_metadata.replace(metadata_path)
+    write_json(metadata_path, new_metadata)
+    temporary_metadata.unlink()
     new_base_sha256 = sha256(base)
     base_parsed = parse_cnf(base)
 

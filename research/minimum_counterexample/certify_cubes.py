@@ -57,6 +57,33 @@ def read_complete_cubes(path: Path, variables: int) -> list[list[int]]:
     return cubes
 
 
+def read_covered_cubes(path: Path, variables: int) -> list[list[int]]:
+    cubes = [
+        [int(token) for token in line.split()[1:-1]]
+        for line in path.read_text(encoding="ascii").splitlines()
+        if line.startswith("a ")
+    ]
+    if not cubes:
+        raise ValueError("cube file has no a-lines")
+    depth = len(cubes[0])
+    if not depth or any(len(cube) != depth for cube in cubes):
+        raise ValueError("covered cubes must have one positive depth")
+    canonical = set()
+    for cube in cubes:
+        cube_variables = [abs(literal) for literal in cube]
+        if (
+            0 in cube
+            or len(set(cube_variables)) != len(cube_variables)
+            or any(variable > variables for variable in cube_variables)
+        ):
+            raise ValueError("covered cube has invalid literals")
+        key = tuple(sorted(cube, key=abs))
+        if key in canonical:
+            raise ValueError("covered cube file contains a duplicate")
+        canonical.add(key)
+    return cubes
+
+
 def parse_cnf(path: Path) -> tuple[list[str], int, int, int]:
     lines = path.read_text(encoding="ascii").splitlines()
     headers = [
@@ -122,6 +149,7 @@ def main() -> None:
     parser.add_argument("--shards", type=int, default=1)
     parser.add_argument("--shard-index", type=int, default=0)
     parser.add_argument("--xz-level", type=int, default=9)
+    parser.add_argument("--coverage", type=Path)
     args = parser.parse_args()
 
     if args.jobs < 1 or args.solver_threads < 1 or args.seconds < 1:
@@ -132,7 +160,21 @@ def main() -> None:
         raise ValueError("xz level must be between 0 and 9")
 
     lines, header_index, variables, clauses = parse_cnf(args.cnf)
-    cubes = read_complete_cubes(args.cubes, variables)
+    if args.coverage is None:
+        cubes = read_complete_cubes(args.cubes, variables)
+        coverage_sha256 = None
+    else:
+        cubes = read_covered_cubes(args.cubes, variables)
+        coverage = json.loads(
+            args.coverage.read_text(encoding="utf-8")
+        )
+        if (
+            coverage.get("verified") is not True
+            or int(coverage["child_count"]) != len(cubes)
+            or coverage.get("children_sha256") != sha256(args.cubes)
+        ):
+            raise ValueError("coverage file does not bind this cube file")
+        coverage_sha256 = sha256(args.coverage)
     selected = [
         (index, cube)
         for index, cube in enumerate(cubes)
@@ -268,6 +310,10 @@ def main() -> None:
             "shards": args.shards,
             "shard_index": args.shard_index,
             "xz_level": args.xz_level,
+            "coverage": (
+                str(args.coverage) if args.coverage is not None else None
+            ),
+            "coverage_sha256": coverage_sha256,
             "selected_cube_indices": [index for index, _ in selected],
             "verified_cube_count": len(ordered_records),
             "failed_cubes": sorted(

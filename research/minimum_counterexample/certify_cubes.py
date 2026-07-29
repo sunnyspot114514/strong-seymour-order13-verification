@@ -150,6 +150,14 @@ def main() -> None:
     parser.add_argument("--shard-index", type=int, default=0)
     parser.add_argument("--xz-level", type=int, default=9)
     parser.add_argument("--coverage", type=Path)
+    parser.add_argument(
+        "--discard-logs",
+        action="store_true",
+        help=(
+            "remove per-cube solver/checker logs after their status and "
+            "timings have been recorded in the manifest"
+        ),
+    )
     args = parser.parse_args()
 
     if args.jobs < 1 or args.solver_threads < 1 or args.seconds < 1:
@@ -272,6 +280,10 @@ def main() -> None:
         compressed_core_bytes = compressed_core.stat().st_size
         raw_proof.unlink()
         leaf_cnf.unlink()
+        if args.discard_logs:
+            solver_log.unlink()
+            extraction_log.unlink()
+            verification_log.unlink()
         return {
             "cube_index": index,
             "literals": cube,
@@ -310,6 +322,7 @@ def main() -> None:
             "shards": args.shards,
             "shard_index": args.shard_index,
             "xz_level": args.xz_level,
+            "logs_retained": not args.discard_logs,
             "coverage": (
                 str(args.coverage) if args.coverage is not None else None
             ),

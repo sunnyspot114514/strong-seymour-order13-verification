@@ -51,6 +51,9 @@ def clean_failed_outputs(
             ".drat",
             ".core.rup",
             ".core.rup.xz",
+            ".solver.log",
+            ".core-extraction.log",
+            ".core-verification.log",
         ):
             path = Path(f"{stem}{suffix}")
             if path.exists():
@@ -167,6 +170,7 @@ def main() -> None:
                 str(round_seconds),
                 "--xz-level",
                 str(args.xz_level),
+                "--discard-logs",
                 "--coverage",
                 str(coverage),
             ],

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate and check pure-RUP certificates for a shard of CNF cubes."""
+"""Generate and check RUP or DRAT certificates for CNF cubes."""
 
 from __future__ import annotations
 
@@ -145,9 +145,15 @@ def main() -> None:
     parser.add_argument("drat_trim", type=Path)
     parser.add_argument(
         "--solver-kind",
-        choices=("gimsatul", "cadical"),
+        choices=("gimsatul", "cadical", "kissat"),
         default="gimsatul",
         help="select the command-line interface used by the SAT solver",
+    )
+    parser.add_argument(
+        "--proof-mode",
+        choices=("rup", "drat"),
+        default="rup",
+        help="restrict drat-trim to RUP or allow full DRAT checking",
     )
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--solver-threads", type=int, default=1)
@@ -218,8 +224,10 @@ def main() -> None:
         stem = f"cube_{index:05d}"
         leaf_cnf = args.output / f"{stem}.cnf"
         raw_proof = args.output / f"{stem}.drat"
-        core = args.output / f"{stem}.core.rup"
-        compressed_core = args.output / f"{stem}.core.rup.xz"
+        core = args.output / f"{stem}.core.{args.proof_mode}"
+        compressed_core = args.output / (
+            f"{stem}.core.{args.proof_mode}.xz"
+        )
         solver_log = args.output / f"{stem}.solver.log"
         extraction_log = args.output / f"{stem}.core-extraction.log"
         verification_log = args.output / f"{stem}.core-verification.log"
@@ -262,16 +270,17 @@ def main() -> None:
             )
         raw_proof_bytes = raw_proof.stat().st_size
 
+        extraction_command = [
+            str(args.drat_trim),
+            str(leaf_cnf),
+            str(raw_proof),
+        ]
+        if args.proof_mode == "rup":
+            extraction_command.append("-U")
+        extraction_command.extend(["-l", str(core)])
         extraction_status, extraction_seconds, extraction_output = (
             run_checked(
-                [
-                    str(args.drat_trim),
-                    str(leaf_cnf),
-                    str(raw_proof),
-                    "-U",
-                    "-l",
-                    str(core),
-                ],
+                extraction_command,
                 extraction_log,
                 checker_seconds,
             )
@@ -283,14 +292,16 @@ def main() -> None:
             )
         core_bytes = core.stat().st_size
 
+        verification_command = [
+            str(args.drat_trim),
+            str(leaf_cnf),
+            str(core),
+        ]
+        if args.proof_mode == "rup":
+            verification_command.append("-U")
         verification_status, verification_seconds, verification_output = (
             run_checked(
-                [
-                    str(args.drat_trim),
-                    str(leaf_cnf),
-                    str(core),
-                    "-U",
-                ],
+                verification_command,
                 verification_log,
                 checker_seconds,
             )
@@ -313,6 +324,15 @@ def main() -> None:
             solver_log.unlink()
             extraction_log.unlink()
             verification_log.unlink()
+        rat_match = re.search(
+            r"c\s+([0-9]+)\s+RAT lemmas in core",
+            verification_output,
+        )
+        rat_lemmas = int(rat_match.group(1)) if rat_match else None
+        if args.proof_mode == "rup" and rat_lemmas not in (None, 0):
+            raise RuntimeError(
+                f"cube {index}: RUP verification reported RAT lemmas"
+            )
         return {
             "cube_index": index,
             "literals": cube,
@@ -328,7 +348,9 @@ def main() -> None:
             "compressed_core": compressed_core.name,
             "compressed_core_sha256": compressed_core_sha256,
             "compressed_core_bytes": compressed_core_bytes,
-            "rup_only": True,
+            "proof_mode": args.proof_mode,
+            "rat_lemmas": rat_lemmas,
+            "rup_only": args.proof_mode == "rup",
         }
 
     records: list[dict[str, object]] = []
@@ -353,6 +375,7 @@ def main() -> None:
             "xz_level": args.xz_level,
             "logs_retained": not args.discard_logs,
             "solver_kind": args.solver_kind,
+            "proof_mode": args.proof_mode,
             "solver_seconds_limit": args.seconds,
             "checker_seconds_limit": checker_seconds,
             "coverage": (

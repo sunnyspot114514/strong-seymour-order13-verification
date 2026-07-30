@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a complete adaptive pure-RUP certificate tree for one parent CNF."""
+"""Build a complete adaptive checked certificate tree for one parent CNF."""
 
 from __future__ import annotations
 
@@ -51,6 +51,8 @@ def clean_failed_outputs(
             ".drat",
             ".core.rup",
             ".core.rup.xz",
+            ".core.drat",
+            ".core.drat.xz",
             ".solver.log",
             ".core-extraction.log",
             ".core-verification.log",
@@ -69,9 +71,15 @@ def main() -> None:
     parser.add_argument("drat_trim", type=Path)
     parser.add_argument(
         "--solver-kind",
-        choices=("gimsatul", "cadical"),
+        choices=("gimsatul", "cadical", "kissat"),
         default="gimsatul",
         help="select the command-line interface used by the leaf solver",
+    )
+    parser.add_argument(
+        "--proof-mode",
+        choices=("rup", "drat"),
+        default="rup",
+        help="restrict leaf proofs to RUP or allow full DRAT",
     )
     parser.add_argument("--initial-depth", type=int, default=8)
     parser.add_argument("--additional-depth", type=int, default=6)
@@ -328,6 +336,8 @@ def main() -> None:
                 str(args.drat_trim),
                 "--solver-kind",
                 args.solver_kind,
+                "--proof-mode",
+                args.proof_mode,
                 "--jobs",
                 str(args.jobs),
                 "--solver-threads",
@@ -362,7 +372,14 @@ def main() -> None:
             verified_indices & failed_indices
             or verified_indices | failed_indices
             != set(range(child_count))
-            or any(record.get("rup_only") is not True for record in records)
+            or any(
+                record.get("proof_mode") != args.proof_mode
+                or (
+                    args.proof_mode == "rup"
+                    and record.get("rup_only") is not True
+                )
+                for record in records
+            )
         ):
             raise ValueError(
                 f"round {round_number} has an incomplete manifest"
@@ -399,6 +416,7 @@ def main() -> None:
             "failed_indices": ordered_failed,
             "seconds_per_command": round_seconds,
             "solver_kind": args.solver_kind,
+            "proof_mode": args.proof_mode,
             "checker_seconds_per_command": (
                 args.checker_seconds or round_seconds
             ),
@@ -422,6 +440,13 @@ def main() -> None:
                 "jobs": args.jobs,
                 "xz_level": args.xz_level,
                 "solver_kind": args.solver_kind,
+                "proof_mode": args.proof_mode,
+                "proof_modes": sorted(
+                    {
+                        str(record.get("proof_mode", "rup"))
+                        for record in rounds
+                    }
+                ),
                 "checker_seconds_per_command": args.checker_seconds,
                 "round_count": round_number,
                 "terminal_refutations": total_refutations,
@@ -462,6 +487,13 @@ def main() -> None:
         "jobs": args.jobs,
         "xz_level": args.xz_level,
         "solver_kind": args.solver_kind,
+        "proof_mode": args.proof_mode,
+        "proof_modes": sorted(
+            {
+                str(record.get("proof_mode", "rup"))
+                for record in rounds
+            }
+        ),
         "checker_seconds_per_command": args.checker_seconds,
         "round_count": len(rounds),
         "terminal_refutations": total_refutations,

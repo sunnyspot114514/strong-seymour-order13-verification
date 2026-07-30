@@ -1,4 +1,4 @@
-name: Order-20 adaptive RUP certificates
+name: Order-20 adaptive SAT certificates
 
 on:
   workflow_dispatch:
@@ -32,6 +32,14 @@ jobs:
           git clone --quiet https://github.com/arminbiere/gimsatul.git tools/gimsatul
           git -C tools/gimsatul checkout --quiet 4664fd74c97f87e30e7f907181707679b6fa49f2
           cd tools/gimsatul
+          ./configure
+          make -j4
+
+      - name: Build pinned Kissat
+        run: |
+          git clone --quiet https://github.com/arminbiere/kissat.git tools/kissat
+          git -C tools/kissat checkout --quiet 8af8e56f174b778aef3aa45af9f739b2a5f492c2
+          cd tools/kissat
           ./configure
           make -j4
 
@@ -109,9 +117,18 @@ jobs:
           parent="work/${stem}.cube_${PARENT_INDEX}.cnf"
           solver="tools/gimsatul/gimsatul"
           solver_kind="gimsatul"
+          if [[ "${{ matrix.use_cadical || false }}" == "true" &&
+                "${{ matrix.use_kissat || false }}" == "true" ]]; then
+            echo "choose at most one alternate solver" >&2
+            exit 2
+          fi
           if [[ "${{ matrix.use_cadical || false }}" == "true" ]]; then
             solver="tools/cadical/build/cadical"
             solver_kind="cadical"
+          fi
+          if [[ "${{ matrix.use_kissat || false }}" == "true" ]]; then
+            solver="tools/kissat/build/kissat"
+            solver_kind="kissat"
           fi
           resume_args=()
           if [[ -n "$RESUME_RUN_ID" ]]; then
@@ -122,6 +139,7 @@ jobs:
             tools/generate-cadical-cubes \
             "$solver" tools/drat-trim/drat-trim \
             --solver-kind "$solver_kind" \
+            --proof-mode "${{ matrix.proof_mode || 'rup' }}" \
             --initial-depth "${{ matrix.initial_depth || 8 }}" \
             --additional-depth "${{ matrix.additional_depth || 6 }}" \
             --seconds "${{ matrix.seconds || 120 }}" \
@@ -146,6 +164,8 @@ jobs:
             > certificate/DRAT_TRIM_COMMIT.txt
           git -C tools/cadical rev-parse HEAD \
             > certificate/CADICAL_COMMIT.txt
+          git -C tools/kissat rev-parse HEAD \
+            > certificate/KISSAT_COMMIT.txt
           gcc --version | head -n 1 > certificate/GCC_VERSION.txt
 
       - name: Upload checked adaptive certificate

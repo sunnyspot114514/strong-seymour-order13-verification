@@ -107,6 +107,12 @@ jobs:
         run: |
           stem="n20_d${DEGREE}p${COVER_LEFT}"
           parent="work/${stem}.cube_${PARENT_INDEX}.cnf"
+          solver="tools/gimsatul/gimsatul"
+          solver_kind="gimsatul"
+          if [[ "${{ matrix.use_cadical || false }}" == "true" ]]; then
+            solver="tools/cadical/build/cadical"
+            solver_kind="cadical"
+          fi
           resume_args=()
           if [[ -n "$RESUME_RUN_ID" ]]; then
             resume_args+=(--resume)
@@ -114,7 +120,8 @@ jobs:
           python3 research/minimum_counterexample/adaptive_certify_parent.py \
             "$parent" certificate/adaptive \
             tools/generate-cadical-cubes \
-            tools/gimsatul/gimsatul tools/drat-trim/drat-trim \
+            "$solver" tools/drat-trim/drat-trim \
+            --solver-kind "$solver_kind" \
             --initial-depth "${{ matrix.initial_depth || 8 }}" \
             --additional-depth "${{ matrix.additional_depth || 6 }}" \
             --seconds "${{ matrix.seconds || 120 }}" \

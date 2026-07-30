@@ -141,8 +141,14 @@ def main() -> None:
     parser.add_argument("cnf", type=Path)
     parser.add_argument("cubes", type=Path)
     parser.add_argument("output", type=Path)
-    parser.add_argument("gimsatul", type=Path)
+    parser.add_argument("solver", type=Path)
     parser.add_argument("drat_trim", type=Path)
+    parser.add_argument(
+        "--solver-kind",
+        choices=("gimsatul", "cadical"),
+        default="gimsatul",
+        help="select the command-line interface used by the SAT solver",
+    )
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--solver-threads", type=int, default=1)
     parser.add_argument("--seconds", type=int, default=3600)
@@ -217,13 +223,22 @@ def main() -> None:
         )
         leaf_sha256 = sha256(leaf_cnf)
 
-        solver_status, solver_seconds, solver_output = run_checked(
-            [
-                str(args.gimsatul),
+        if args.solver_kind == "gimsatul":
+            solver_command = [
+                str(args.solver),
                 f"--threads={args.solver_threads}",
                 str(leaf_cnf),
                 str(raw_proof),
-            ],
+            ]
+        else:
+            solver_command = [
+                str(args.solver),
+                "-q",
+                str(leaf_cnf),
+                str(raw_proof),
+            ]
+        solver_status, solver_seconds, solver_output = run_checked(
+            solver_command,
             solver_log,
             args.seconds,
         )
@@ -323,6 +338,7 @@ def main() -> None:
             "shard_index": args.shard_index,
             "xz_level": args.xz_level,
             "logs_retained": not args.discard_logs,
+            "solver_kind": args.solver_kind,
             "coverage": (
                 str(args.coverage) if args.coverage is not None else None
             ),

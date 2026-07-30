@@ -65,8 +65,14 @@ def main() -> None:
     parser.add_argument("parent_cnf", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("cube_generator", type=Path)
-    parser.add_argument("gimsatul", type=Path)
+    parser.add_argument("solver", type=Path)
     parser.add_argument("drat_trim", type=Path)
+    parser.add_argument(
+        "--solver-kind",
+        choices=("gimsatul", "cadical"),
+        default="gimsatul",
+        help="select the command-line interface used by the leaf solver",
+    )
     parser.add_argument("--initial-depth", type=int, default=8)
     parser.add_argument("--additional-depth", type=int, default=6)
     parser.add_argument("--seconds", type=int, default=120)
@@ -126,7 +132,7 @@ def main() -> None:
     for path in (
         args.parent_cnf,
         args.cube_generator,
-        args.gimsatul,
+        args.solver,
         args.drat_trim,
     ):
         if not path.exists():
@@ -308,8 +314,10 @@ def main() -> None:
                 str(args.parent_cnf),
                 str(children),
                 str(certificate_dir),
-                str(args.gimsatul),
+                str(args.solver),
                 str(args.drat_trim),
+                "--solver-kind",
+                args.solver_kind,
                 "--jobs",
                 str(args.jobs),
                 "--solver-threads",
@@ -378,6 +386,7 @@ def main() -> None:
             "failed_count": len(ordered_failed),
             "failed_indices": ordered_failed,
             "seconds_per_command": round_seconds,
+            "solver_kind": args.solver_kind,
         }
         rounds.append(round_record)
 
@@ -397,6 +406,7 @@ def main() -> None:
                 ),
                 "jobs": args.jobs,
                 "xz_level": args.xz_level,
+                "solver_kind": args.solver_kind,
                 "round_count": round_number,
                 "terminal_refutations": total_refutations,
                 "rounds": rounds,
@@ -435,6 +445,7 @@ def main() -> None:
         "fixed_variable_upper_bound": args.fixed_variable_upper_bound,
         "jobs": args.jobs,
         "xz_level": args.xz_level,
+        "solver_kind": args.solver_kind,
         "round_count": len(rounds),
         "terminal_refutations": total_refutations,
         "rounds": rounds,

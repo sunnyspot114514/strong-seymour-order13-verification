@@ -192,6 +192,11 @@ def main() -> None:
     if not 0 <= args.xz_level <= 9:
         raise ValueError("xz level must be between 0 and 9")
     checker_seconds = args.checker_seconds or args.seconds
+    solver_profile = (
+        "rup-safe"
+        if args.solver_kind == "kissat" and args.proof_mode == "rup"
+        else "default"
+    )
 
     lines, header_index, variables, clauses = parse_cnf(args.cnf)
     if args.coverage is None:
@@ -253,8 +258,20 @@ def main() -> None:
                 str(raw_proof),
             ]
         else:
+            solver_options: list[str] = []
+            if solver_profile == "rup-safe":
+                solver_options = [
+                    "--eliminate=false",
+                    "--ands=false",
+                    "--equivalences=false",
+                    "--definitions=false",
+                    "--factor=false",
+                    "--congruence=false",
+                    "--substitute=false",
+                ]
             solver_command = [
                 str(args.solver),
+                *solver_options,
                 "-q",
                 str(leaf_cnf),
                 str(raw_proof),
@@ -375,6 +392,7 @@ def main() -> None:
             "xz_level": args.xz_level,
             "logs_retained": not args.discard_logs,
             "solver_kind": args.solver_kind,
+            "solver_profile": solver_profile,
             "proof_mode": args.proof_mode,
             "solver_seconds_limit": args.seconds,
             "checker_seconds_limit": checker_seconds,

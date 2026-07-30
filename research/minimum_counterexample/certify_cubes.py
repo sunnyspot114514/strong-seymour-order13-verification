@@ -152,6 +152,14 @@ def main() -> None:
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--solver-threads", type=int, default=1)
     parser.add_argument("--seconds", type=int, default=3600)
+    parser.add_argument(
+        "--checker-seconds",
+        type=int,
+        default=0,
+        help=(
+            "timeout for each drat-trim pass; zero reuses --seconds"
+        ),
+    )
     parser.add_argument("--shards", type=int, default=1)
     parser.add_argument("--shard-index", type=int, default=0)
     parser.add_argument("--xz-level", type=int, default=9)
@@ -166,12 +174,18 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    if args.jobs < 1 or args.solver_threads < 1 or args.seconds < 1:
+    if (
+        args.jobs < 1
+        or args.solver_threads < 1
+        or args.seconds < 1
+        or args.checker_seconds < 0
+    ):
         raise ValueError("jobs, solver threads, and seconds must be positive")
     if args.shards < 1 or not 0 <= args.shard_index < args.shards:
         raise ValueError("invalid shard specification")
     if not 0 <= args.xz_level <= 9:
         raise ValueError("xz level must be between 0 and 9")
+    checker_seconds = args.checker_seconds or args.seconds
 
     lines, header_index, variables, clauses = parse_cnf(args.cnf)
     if args.coverage is None:
@@ -259,7 +273,7 @@ def main() -> None:
                     str(core),
                 ],
                 extraction_log,
-                args.seconds,
+                checker_seconds,
             )
         )
         if "s VERIFIED" not in extraction_output:
@@ -278,7 +292,7 @@ def main() -> None:
                     "-U",
                 ],
                 verification_log,
-                args.seconds,
+                checker_seconds,
             )
         )
         if "s VERIFIED" not in verification_output:
@@ -339,6 +353,8 @@ def main() -> None:
             "xz_level": args.xz_level,
             "logs_retained": not args.discard_logs,
             "solver_kind": args.solver_kind,
+            "solver_seconds_limit": args.seconds,
+            "checker_seconds_limit": checker_seconds,
             "coverage": (
                 str(args.coverage) if args.coverage is not None else None
             ),

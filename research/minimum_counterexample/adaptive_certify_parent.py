@@ -78,6 +78,15 @@ def main() -> None:
     parser.add_argument("--seconds", type=int, default=120)
     parser.add_argument("--maximum-seconds", type=int, default=600)
     parser.add_argument(
+        "--checker-seconds",
+        type=int,
+        default=0,
+        help=(
+            "timeout for each drat-trim pass; zero follows the current "
+            "solver timeout"
+        ),
+    )
+    parser.add_argument(
         "--constant-rounds",
         type=int,
         default=1,
@@ -121,6 +130,7 @@ def main() -> None:
         or args.additional_depth < 1
         or args.seconds < 1
         or args.maximum_seconds < args.seconds
+        or args.checker_seconds < 0
         or args.constant_rounds < 1
         or args.retries_before_split < 0
         or args.fixed_variable_upper_bound < 0
@@ -324,6 +334,8 @@ def main() -> None:
                 "1",
                 "--seconds",
                 str(round_seconds),
+                "--checker-seconds",
+                str(args.checker_seconds),
                 "--xz-level",
                 str(args.xz_level),
                 "--discard-logs",
@@ -387,6 +399,9 @@ def main() -> None:
             "failed_indices": ordered_failed,
             "seconds_per_command": round_seconds,
             "solver_kind": args.solver_kind,
+            "checker_seconds_per_command": (
+                args.checker_seconds or round_seconds
+            ),
         }
         rounds.append(round_record)
 
@@ -407,6 +422,7 @@ def main() -> None:
                 "jobs": args.jobs,
                 "xz_level": args.xz_level,
                 "solver_kind": args.solver_kind,
+                "checker_seconds_per_command": args.checker_seconds,
                 "round_count": round_number,
                 "terminal_refutations": total_refutations,
                 "rounds": rounds,
@@ -446,6 +462,7 @@ def main() -> None:
         "jobs": args.jobs,
         "xz_level": args.xz_level,
         "solver_kind": args.solver_kind,
+        "checker_seconds_per_command": args.checker_seconds,
         "round_count": len(rounds),
         "terminal_refutations": total_refutations,
         "rounds": rounds,

@@ -126,6 +126,7 @@ jobs:
             --additional-depth "${{ matrix.additional_depth || 6 }}" \
             --seconds "${{ matrix.seconds || 120 }}" \
             --maximum-seconds "${{ matrix.maximum_seconds || 600 }}" \
+            --checker-seconds "${{ matrix.checker_seconds || 0 }}" \
             --constant-rounds "${{ matrix.constant_rounds || 1 }}" \
             --retries-before-split \
               "${{ matrix.retries_before_split || 0 }}" \

@@ -114,6 +114,15 @@ def main() -> None:
     )
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--rounds", type=int, default=8)
+    parser.add_argument(
+        "--additional-rounds",
+        type=int,
+        default=0,
+        help=(
+            "when resuming, run exactly this many further rounds instead "
+            "of using the absolute --rounds limit"
+        ),
+    )
     parser.add_argument("--xz-level", type=int, default=1)
     parser.add_argument(
         "--resume",
@@ -152,11 +161,14 @@ def main() -> None:
         or args.fixed_variable_upper_bound < 0
         or args.jobs < 1
         or args.rounds < 1
+        or args.additional_rounds < 0
         or not 0 <= args.xz_level <= 9
     ):
         raise ValueError("invalid adaptive-certificate parameters")
     if args.split_on_resume and not args.resume:
         raise ValueError("--split-on-resume requires --resume")
+    if args.additional_rounds and not args.resume:
+        raise ValueError("--additional-rounds requires --resume")
     for path in (
         args.parent_cnf,
         args.cube_generator,
@@ -227,11 +239,17 @@ def main() -> None:
         if args.split_on_resume:
             retries_since_split = args.retries_before_split
         start_round = len(rounds) + 1
+        end_round = (
+            start_round + args.additional_rounds - 1
+            if args.additional_rounds
+            else args.rounds
+        )
         print(
             json.dumps(
                 {
                     "resuming": True,
                     "next_round": start_round,
+                    "last_round": end_round,
                     "unresolved_cubes": len(read_cubes(parents)),
                     "retained_refutations": total_refutations,
                     "split_on_resume": args.split_on_resume,
@@ -249,8 +267,9 @@ def main() -> None:
         total_refutations = 0
         retries_since_split = 0
         start_round = 1
+        end_round = args.rounds
 
-    for round_number in range(start_round, args.rounds + 1):
+    for round_number in range(start_round, end_round + 1):
         round_dir = args.output / f"round_{round_number:02d}"
         round_dir.mkdir()
         round_parents = round_dir / "parents.cubes"

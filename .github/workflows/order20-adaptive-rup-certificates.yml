@@ -141,6 +141,12 @@ jobs:
           if [[ "${{ matrix.split_on_resume || false }}" == "true" ]]; then
             resume_args+=(--split-on-resume)
           fi
+          if [[ "${{ matrix.additional_rounds || 0 }}" != "0" ]]; then
+            resume_args+=(
+              --additional-rounds
+              "${{ matrix.additional_rounds }}"
+            )
+          fi
           python3 research/minimum_counterexample/adaptive_certify_parent.py \
             "$parent" certificate/adaptive \
             tools/generate-cadical-cubes \

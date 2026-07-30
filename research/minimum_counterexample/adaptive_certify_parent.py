@@ -121,6 +121,14 @@ def main() -> None:
         help="continue a verified round-limit partial tree in output",
     )
     parser.add_argument(
+        "--split-on-resume",
+        action="store_true",
+        help=(
+            "make the first resumed round a split even when the retained "
+            "frontier would otherwise be retried"
+        ),
+    )
+    parser.add_argument(
         "--fixed-variable-upper-bound",
         type=int,
         default=0,
@@ -147,6 +155,8 @@ def main() -> None:
         or not 0 <= args.xz_level <= 9
     ):
         raise ValueError("invalid adaptive-certificate parameters")
+    if args.split_on_resume and not args.resume:
+        raise ValueError("--split-on-resume requires --resume")
     for path in (
         args.parent_cnf,
         args.cube_generator,
@@ -214,6 +224,8 @@ def main() -> None:
             raise ValueError(
                 "prior retry state exceeds --retries-before-split"
             )
+        if args.split_on_resume:
+            retries_since_split = args.retries_before_split
         start_round = len(rounds) + 1
         print(
             json.dumps(
@@ -222,6 +234,7 @@ def main() -> None:
                     "next_round": start_round,
                     "unresolved_cubes": len(read_cubes(parents)),
                     "retained_refutations": total_refutations,
+                    "split_on_resume": args.split_on_resume,
                 },
                 separators=(",", ":"),
             ),

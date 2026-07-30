@@ -138,6 +138,9 @@ jobs:
           if [[ -n "$RESUME_RUN_ID" ]]; then
             resume_args+=(--resume)
           fi
+          if [[ "${{ matrix.split_on_resume || false }}" == "true" ]]; then
+            resume_args+=(--split-on-resume)
+          fi
           python3 research/minimum_counterexample/adaptive_certify_parent.py \
             "$parent" certificate/adaptive \
             tools/generate-cadical-cubes \

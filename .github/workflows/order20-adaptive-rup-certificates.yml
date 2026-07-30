@@ -117,6 +117,7 @@ jobs:
           parent="work/${stem}.cube_${PARENT_INDEX}.cnf"
           solver="tools/gimsatul/gimsatul"
           solver_kind="gimsatul"
+          proof_mode="rup"
           if [[ "${{ matrix.use_cadical || false }}" == "true" &&
                 "${{ matrix.use_kissat || false }}" == "true" ]]; then
             echo "choose at most one alternate solver" >&2
@@ -130,6 +131,9 @@ jobs:
             solver="tools/kissat/build/kissat"
             solver_kind="kissat"
           fi
+          if [[ "${{ matrix.allow_drat || false }}" == "true" ]]; then
+            proof_mode="drat"
+          fi
           resume_args=()
           if [[ -n "$RESUME_RUN_ID" ]]; then
             resume_args+=(--resume)
@@ -139,7 +143,7 @@ jobs:
             tools/generate-cadical-cubes \
             "$solver" tools/drat-trim/drat-trim \
             --solver-kind "$solver_kind" \
-            --proof-mode "${{ matrix.proof_mode || 'rup' }}" \
+            --proof-mode "$proof_mode" \
             --initial-depth "${{ matrix.initial_depth || 8 }}" \
             --additional-depth "${{ matrix.additional_depth || 6 }}" \
             --seconds "${{ matrix.seconds || 120 }}" \

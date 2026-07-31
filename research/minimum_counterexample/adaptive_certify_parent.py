@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -38,6 +39,26 @@ def read_cubes(path: Path) -> list[list[int]]:
     if not cubes:
         raise ValueError(f"{path} contains no cubes")
     return cubes
+
+
+def write_json_atomic(path: Path, payload: dict[str, object]) -> None:
+    temporary = path.with_name(f"{path.name}.tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    temporary.replace(path)
+
+
+def prune_uncommitted_rounds(output: Path, committed_count: int) -> None:
+    for path in output.glob("round_*"):
+        suffix = path.name.removeprefix("round_")
+        if not suffix.isdigit() or int(suffix) <= committed_count:
+            continue
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
 
 
 def clean_failed_outputs(
@@ -178,6 +199,8 @@ def main() -> None:
         if not path.exists():
             raise FileNotFoundError(path)
 
+    parent_cnf_sha256 = sha256(args.parent_cnf)
+
     script_dir = Path(__file__).resolve().parent
     refine_script = script_dir / "refine_cubes.py"
     primary_refine_script = script_dir / "refine_cubes_primary.py"
@@ -196,7 +219,7 @@ def main() -> None:
         if (
             partial.get("verified") is not False
             or partial.get("reason") != "round limit reached"
-            or partial.get("parent_cnf_sha256") != sha256(args.parent_cnf)
+            or partial.get("parent_cnf_sha256") != parent_cnf_sha256
             or not isinstance(rounds, list)
             or not rounds
         ):
@@ -209,6 +232,7 @@ def main() -> None:
                 raise ValueError(
                     f"invalid prior round metadata in {partial_path}"
                 )
+        prune_uncommitted_rounds(args.output, len(rounds))
         last_record = rounds[-1]
         if int(last_record["failed_count"]) < 1:
             raise ValueError(
@@ -268,6 +292,37 @@ def main() -> None:
         retries_since_split = 0
         start_round = 1
         end_round = args.rounds
+
+    def manifest_payload(verified: bool) -> dict[str, object]:
+        payload: dict[str, object] = {
+            "verified": verified,
+            "parent_cnf": args.parent_cnf.name,
+            "parent_cnf_sha256": parent_cnf_sha256,
+            "initial_depth": args.initial_depth,
+            "additional_depth": args.additional_depth,
+            "initial_seconds_per_command": args.seconds,
+            "maximum_seconds_per_command": args.maximum_seconds,
+            "constant_timeout_rounds": args.constant_rounds,
+            "retries_before_split": args.retries_before_split,
+            "fixed_variable_upper_bound": args.fixed_variable_upper_bound,
+            "jobs": args.jobs,
+            "xz_level": args.xz_level,
+            "solver_kind": args.solver_kind,
+            "proof_mode": args.proof_mode,
+            "proof_modes": sorted(
+                {
+                    str(record.get("proof_mode", "rup"))
+                    for record in rounds
+                }
+            ),
+            "checker_seconds_per_command": args.checker_seconds,
+            "round_count": len(rounds),
+            "terminal_refutations": total_refutations,
+            "rounds": rounds,
+        }
+        if not verified:
+            payload["reason"] = "round limit reached"
+        return payload
 
     for round_number in range(start_round, end_round + 1):
         round_dir = args.output / f"round_{round_number:02d}"
@@ -456,39 +511,9 @@ def main() -> None:
         rounds.append(round_record)
 
         if not ordered_failed:
-            result = {
-                "verified": True,
-                "parent_cnf": args.parent_cnf.name,
-                "parent_cnf_sha256": sha256(args.parent_cnf),
-                "initial_depth": args.initial_depth,
-                "additional_depth": args.additional_depth,
-                "initial_seconds_per_command": args.seconds,
-                "maximum_seconds_per_command": args.maximum_seconds,
-                "constant_timeout_rounds": args.constant_rounds,
-                "retries_before_split": args.retries_before_split,
-                "fixed_variable_upper_bound": (
-                    args.fixed_variable_upper_bound
-                ),
-                "jobs": args.jobs,
-                "xz_level": args.xz_level,
-                "solver_kind": args.solver_kind,
-                "proof_mode": args.proof_mode,
-                "proof_modes": sorted(
-                    {
-                        str(record.get("proof_mode", "rup"))
-                        for record in rounds
-                    }
-                ),
-                "checker_seconds_per_command": args.checker_seconds,
-                "round_count": round_number,
-                "terminal_refutations": total_refutations,
-                "rounds": rounds,
-            }
+            result = manifest_payload(True)
             output = args.output / "adaptive_manifest.json"
-            output.write_text(
-                json.dumps(result, indent=2) + "\n",
-                encoding="utf-8",
-            )
+            write_json_atomic(output, result)
             print(json.dumps(result, separators=(",", ":")))
             return
 
@@ -503,37 +528,14 @@ def main() -> None:
             ]
         )
         parents = next_parents
+        write_json_atomic(
+            args.output / "adaptive_manifest.json",
+            manifest_payload(False),
+        )
 
-    partial = {
-        "verified": False,
-        "reason": "round limit reached",
-        "parent_cnf": args.parent_cnf.name,
-        "parent_cnf_sha256": sha256(args.parent_cnf),
-        "initial_depth": args.initial_depth,
-        "additional_depth": args.additional_depth,
-        "initial_seconds_per_command": args.seconds,
-        "maximum_seconds_per_command": args.maximum_seconds,
-        "constant_timeout_rounds": args.constant_rounds,
-        "retries_before_split": args.retries_before_split,
-        "fixed_variable_upper_bound": args.fixed_variable_upper_bound,
-        "jobs": args.jobs,
-        "xz_level": args.xz_level,
-        "solver_kind": args.solver_kind,
-        "proof_mode": args.proof_mode,
-        "proof_modes": sorted(
-            {
-                str(record.get("proof_mode", "rup"))
-                for record in rounds
-            }
-        ),
-        "checker_seconds_per_command": args.checker_seconds,
-        "round_count": len(rounds),
-        "terminal_refutations": total_refutations,
-        "rounds": rounds,
-    }
-    (args.output / "adaptive_manifest.json").write_text(
-        json.dumps(partial, indent=2) + "\n",
-        encoding="utf-8",
+    write_json_atomic(
+        args.output / "adaptive_manifest.json",
+        manifest_payload(False),
     )
     raise SystemExit("adaptive certificate did not finish")
 

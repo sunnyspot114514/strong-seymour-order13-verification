@@ -25,7 +25,8 @@ jobs:
         include: ${{ fromJSON(inputs.tasks) }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out the dispatched revision
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Build pinned Gimsatul
         run: |
@@ -91,28 +92,79 @@ jobs:
             "${prefix}.cnf" "${prefix}.unused.cubes" \
             "${prefix}.parent.json" --depth 1
 
+      - name: Resolve the unique prior artifact
+        if: ${{ matrix.resume_run_id }}
+        id: resolve_resume
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESUME_RUN_ID: ${{ matrix.resume_run_id }}
+          ARTIFACT_NAME: >-
+            order20-adaptive-rup-d${{ matrix.degree }}-p${{ matrix.cover_left }}-c${{ matrix.parent_index }}
+        run: |
+          set -euo pipefail
+          gh api \
+            "repos/${GITHUB_REPOSITORY}/actions/runs/${RESUME_RUN_ID}/artifacts?per_page=100" \
+            > resume-artifacts.json
+          jq --arg name "$ARTIFACT_NAME" \
+            '[.artifacts[] | select(.name == $name and .expired == false)]' \
+            resume-artifacts.json > matching-artifacts.json
+          count="$(jq 'length' matching-artifacts.json)"
+          if [[ "$count" != "1" ]]; then
+            echo "expected one unexpired artifact named $ARTIFACT_NAME, found $count" >&2
+            exit 1
+          fi
+          artifact_id="$(jq -r '.[0].id' matching-artifacts.json)"
+          artifact_digest="$(jq -r '.[0].digest' matching-artifacts.json)"
+          if [[ ! "$artifact_id" =~ ^[1-9][0-9]*$ ||
+                ! "$artifact_digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "prior artifact has invalid id or digest" >&2
+            exit 1
+          fi
+          jq '.[0]' matching-artifacts.json \
+            > certificate/RESUME_ARTIFACT.json
+          echo "artifact_id=$artifact_id" >> "$GITHUB_OUTPUT"
+          echo "artifact_digest=$artifact_digest" >> "$GITHUB_OUTPUT"
+
       - name: Download prior partial certificate
         if: ${{ matrix.resume_run_id }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: order20-adaptive-rup-d${{ matrix.degree }}-p${{ matrix.cover_left }}-c${{ matrix.parent_index }}
+          artifact-ids: ${{ steps.resolve_resume.outputs.artifact_id }}
           path: resume-artifact
+          merge-multiple: true
           run-id: ${{ matrix.resume_run_id }}
           github-token: ${{ github.token }}
+          digest-mismatch: error
 
-      - name: Restore prior partial certificate
+      - name: Audit and restore the prior partial certificate
         if: ${{ matrix.resume_run_id }}
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+          PARENT_INDEX: ${{ matrix.parent_index }}
         run: |
-          test -f resume-artifact/certificate/adaptive/adaptive_manifest.json
-          cp -a resume-artifact/certificate/adaptive certificate/adaptive
+          set -euo pipefail
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          parent="work/${stem}.cube_${PARENT_INDEX}.cnf"
+          python3 \
+            research/minimum_counterexample/audit_adaptive_certificate.py \
+            resume-artifact/certificate/adaptive "$parent" \
+            --require-partial \
+            --require-rup \
+            --report certificate/RESUME_AUDIT.json
+          test ! -e certificate/adaptive
+          mv resume-artifact/certificate/adaptive certificate/adaptive
 
       - name: Produce and check the adaptive certificate tree
+        id: produce
         env:
           DEGREE: ${{ matrix.degree }}
           COVER_LEFT: ${{ matrix.cover_left }}
           PARENT_INDEX: ${{ matrix.parent_index }}
           RESUME_RUN_ID: ${{ matrix.resume_run_id }}
+          SOLVER_WALL_MINUTES: ${{ matrix.solver_wall_minutes || 300 }}
         run: |
+          set -euo pipefail
           stem="n20_d${DEGREE}p${COVER_LEFT}"
           parent="work/${stem}.cube_${PARENT_INDEX}.cnf"
           solver="tools/gimsatul/gimsatul"
@@ -147,7 +199,15 @@ jobs:
               "${{ matrix.additional_rounds }}"
             )
           fi
-          python3 research/minimum_counterexample/adaptive_certify_parent.py \
+          if [[ ! "$SOLVER_WALL_MINUTES" =~ ^[1-9][0-9]*$ ||
+                "$SOLVER_WALL_MINUTES" -gt 300 ]]; then
+            echo "solver_wall_minutes must be an integer from 1 through 300" >&2
+            exit 2
+          fi
+          set +e
+          timeout --signal=TERM --kill-after=30s \
+            "${SOLVER_WALL_MINUTES}m" \
+            python3 research/minimum_counterexample/adaptive_certify_parent.py \
             "$parent" certificate/adaptive \
             tools/generate-cadical-cubes \
             "$solver" tools/drat-trim/drat-trim \
@@ -167,6 +227,10 @@ jobs:
             --fixed-variable-upper-bound \
               "${{ matrix.fixed_variable_upper_bound || 0 }}" \
             "${resume_args[@]}"
+          status=$?
+          set -e
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
 
       - name: Record provenance
         if: always()
@@ -181,18 +245,39 @@ jobs:
             > certificate/KISSAT_COMMIT.txt
           gcc --version | head -n 1 > certificate/GCC_VERSION.txt
 
-      - name: Upload checked adaptive certificate
+      - name: Audit the complete committed certificate tree
         if: always()
-        uses: actions/upload-artifact@v4
+        id: adaptive_audit
+        env:
+          DEGREE: ${{ matrix.degree }}
+          COVER_LEFT: ${{ matrix.cover_left }}
+          PARENT_INDEX: ${{ matrix.parent_index }}
+        run: |
+          set -euo pipefail
+          stem="n20_d${DEGREE}p${COVER_LEFT}"
+          parent="work/${stem}.cube_${PARENT_INDEX}.cnf"
+          python3 \
+            research/minimum_counterexample/audit_adaptive_certificate.py \
+            certificate/adaptive "$parent" \
+            --require-rup \
+            --prune-uncommitted \
+            --report certificate/ADAPTIVE_AUDIT.json
+
+      - name: Upload checked adaptive certificate
+        if: ${{ always() && steps.adaptive_audit.outcome == 'success' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: order20-adaptive-rup-d${{ matrix.degree }}-p${{ matrix.cover_left }}-c${{ matrix.parent_index }}
           path: |
             work/*.cnf
             work/*.json
             work/*.cubes
+            certificate/*.json
             certificate/*.txt
             certificate/**/*.json
             certificate/**/*.cubes
             certificate/**/*.log
             certificate/**/*.xz
+          if-no-files-found: error
+          compression-level: 0
           retention-days: 30

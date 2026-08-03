@@ -151,6 +151,7 @@ jobs:
             resume-artifact/certificate/adaptive "$parent" \
             --require-partial \
             --require-rup \
+            --prune-uncommitted \
             --report certificate/RESUME_AUDIT.json
           test ! -e certificate/adaptive
           mv resume-artifact/certificate/adaptive certificate/adaptive

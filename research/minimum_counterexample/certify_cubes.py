@@ -136,6 +136,16 @@ def run_checked(
     return status, elapsed, output
 
 
+def require_successful_check(
+    index: int,
+    stage: str,
+    status: int,
+    output: str,
+) -> None:
+    if status != 0 or "s VERIFIED" not in output:
+        raise RuntimeError(f"cube {index}: {stage} status {status}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("cnf", type=Path)
@@ -302,11 +312,12 @@ def main() -> None:
                 checker_seconds,
             )
         )
-        if "s VERIFIED" not in extraction_output:
-            raise RuntimeError(
-                f"cube {index}: core extraction status "
-                f"{extraction_status}"
-            )
+        require_successful_check(
+            index,
+            "core extraction",
+            extraction_status,
+            extraction_output,
+        )
         core_bytes = core.stat().st_size
 
         verification_command = [
@@ -323,11 +334,12 @@ def main() -> None:
                 checker_seconds,
             )
         )
-        if "s VERIFIED" not in verification_output:
-            raise RuntimeError(
-                f"cube {index}: core verification status "
-                f"{verification_status}"
-            )
+        require_successful_check(
+            index,
+            "core verification",
+            verification_status,
+            verification_output,
+        )
 
         subprocess.run(
             ["xz", "-T1", f"-{args.xz_level}", "-f", str(core)],
